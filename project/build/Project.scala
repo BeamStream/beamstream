@@ -1,4 +1,5 @@
 import sbt._
+import Process._
 
 import untyped.{ClosureCompilerPlugin, LessCssPlugin}
 
@@ -43,4 +44,9 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) with Closur
       |b.boot
       |
     """.stripMargin
+
+  lazy val deploy = task {
+    "vmc update beamstream --path target/scala_%s/".format(buildScalaVersion) ! log
+    None
+  }
 }
