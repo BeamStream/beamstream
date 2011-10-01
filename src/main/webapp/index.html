@@ -1,0 +1,168 @@
+<div class="lift:surround?with=default;at=content">
+  <head>
+    <script type="text/javascript">
+<!--
+
+	
+jQuery(document).ready(function(){
+
+var params = {
+		changedEl: ".lineForm select",
+		visRows: 5,
+		scrollArrows: true
+	}
+
+	cuSel(params);
+	
+	var params = {
+		changedEl: "#city",
+		scrollArrows: false
+	}
+
+	cuSel(params);
+	
+
+
+});
+
+-->
+</script>
+
+
+<!-- если требуется поддержка ie6, учим его понимать альфапрозрачность для плавного обрезания текста -->
+<!--[if IE 6]>
+<script type="text/javascript" src="js/DD_belatedPNG.js"></script>
+<script type="text/javascript">
+DD_belatedPNG.fix('.cuselFrameRight');
+jQuery(document).ready(function(){
+jQuery(".cusel").each(
+function(){
+	var w = parseInt(jQuery(this).width()),
+		scrollPanel = jQuery(this).find(".cusel-scroll-pane");
+	if(w>=scrollPanel.width())
+	{
+		jQuery(this).find(".jScrollPaneContainer").width(w);
+		scrollPanel.width(w);
+	}
+});
+jQuery(".cusel-scroll-pane span").hover(
+function()
+{
+	$(this).addClass("cuselOptHover");
+	return;
+},
+function()
+{
+	$(this).removeClass("cuselOptHover");
+	return;
+});
+
+});
+</script>
+<![endif]-->
+  </head>
+<p align="center"><img src="/img/join_bs.png" /></p>
+
+<div class="form-container">
+<form class="lift:form.ajax join_vip_list">
+<div lift="BetaForm">
+  <input name="email" type="text" onFocus="this.value=''" onBlur="if (this.value==''){this.value='E-mail'}" />
+  <div class="lineForm">
+  <input name="role" />
+  <input name="hidden" />
+    <!--
+    <select class="sel80" id="country" name="country" tabindex="2">
+      <option value="Student">Student</option>
+      <option value="Educator">Educator</option>
+      <option value="Professional">Professional</option>
+
+      <option selected="selected" value="1000">I'm a</option>
+    </select>
+    -->
+  </div>
+  <input type="submit" value=" "/>
+</div>
+</form>
+</div>
+
+<div  class="or"><img src="/img/or.png" /></div>
+<div class="list_with_facebook"><img src="/img/fb.png" width="181" height="25" />Join the Beam Beta List with Facebook </div>
+
+<div class="coming_soon">Long ago, our ancestors learned in tribes called classes, from just one leader. Since that ancient time, students &amp; teachers have evolved a new model of higher education: learning from &amp; teaching each other. Welcome to the <strong>BeamStream</strong> social learning era, <strong>BSE</strong>!</div>
+<div class="line_block">
+<div class="col_1">
+
+<div class="block">
+<div class="head">
+<div class="right"></div>
+<div class="left"></div>
+<div class="middle"></div>
+</div>
+<div class="cont">
+<div class="right">
+
+<div class="left">
+<div class="middle">
+
+
+<img src="/img/students.png"  />
+<div class="line2"></div>
+<ul class="num">
+<li class="n1"><span>Beam</span> content &amp; media to classmates via eLearning <span>Streams</span></li>
+<li class="n2">Showcase your academic work, studies, and expertise to the world</li>
+<li class="n3">Form Study <span>Streams</span> in &amp; out of class for mobile eLearning</li>
+<li class="n4">Find &amp; connect with students, professors, experts, mentors, tutors &amp; more</li>
+
+</ul>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="bottm">
+<div class="right"></div>
+<div class="left"></div>
+<div class="middle"></div>
+</div></div>
+
+
+</div>
+<div class="col_2">
+
+<div class="block">
+<div class="head">
+<div class="right"></div>
+<div class="left"></div>
+<div class="middle"></div>
+</div>
+<div class="cont">
+<div class="right">
+
+<div class="left">
+<div class="middle">
+
+<img src="/img/educators.png" />
+<div class="line2"></div>
+<ul class="num">
+<li class="n1">Streamline your class with interactive tools</li>
+<li class="n2">Showcase the abilities of your brilliant students</li>
+<li class="n3">Connect &amp; network with other educators</li>
+<li class="n4">Be found by collaborative companies &amp; prospective students</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+<div class="bottm">
+<div class="right"></div>
+<div class="left"></div>
+<div class="middle"></div>
+</div></div>
+
+</div>
+
+</div>
+</div></div>
+</div>
