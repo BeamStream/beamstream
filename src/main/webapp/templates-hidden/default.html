@@ -30,8 +30,8 @@
   <div class="header">
   <div class="site_width">
     <div class="quick_links">
-      <a href="#">Contact us</a>
-      <a href="#">Our Blog</a>
+      <a href="mailto:info@beamstream.com">Contact us</a>
+      <!--<a href="#">Our Blog</a>-->
     </div>
     <div class="logo"><a href="/index"><h1>BeamStream</h1></a></div>
   </div>
@@ -55,22 +55,31 @@
     <div class="site_width">
       <div class="social_links">
         <div class="follow">
-          <a href="#"><img src="/img/blogger.png" /></a>
-          <a href="#"><img src="/img/facebook.png" /></a>
+          <a href="#" style="visibility:hidden"><img src="/img/blogger.png" /></a>
+          <a href="http://www.facebook.com/pages/BeamStream/100810133312475" target="_blank"><img src="/img/facebook.png" /></a>
           <a href="https://twitter.com/#!/BeamStream" target="_blank"><img src="/img/twitter.png" /></a>
         </div>
         <div class="social_sites">
         <div class="social_sites">
-          <div class="twitter"><a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></div>
+          <div class="twitter"><a href="http://twitter.com/#!/beamstream" class="twitter-follow-button" data-show-count="horizontal">Follow</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></div>
+          <div id="fb-root"></div>
+          <script>(function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+            fjs.parentNode.insertBefore(js, fjs);
+          }(document, 'script', 'facebook-jssdk'));</script>
+          <!--<div class="fb-like" data-href="http://www.facebook.com/pages/BeamStream/100810133312475" data-send="false" data-width="450" data-show-faces="true"></div>
           <div class="facebook" style="text-align:left"><script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
             <fb:like style="border:none; overflow:hidden; width:100px; height:21px;" locale="en_US" lang="en_US" show_faces="false" action="like" layout="button_count"></fb:like>
-          </div>
+          </div>-->
         </div>
         <div class="google"> <g:plusone size="medium"></g:plusone></div>
       </div>
     </div>
     <div class="logo"><a href="/index">BeamStream</a></div>
-    <a href="/contact">Contact us</a>  |  <a href="/blog">Our Blog</a>
+    <a href="mailto:info@beamstream.com">Contact us</a><!--  |  <a href="">Our Blog</a>-->
     <p class="copy">Copyright &copy; 2011 Beamstream.</p>
 </div>
 </div>
