@@ -48,5 +48,5 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) with Closur
   lazy val deploy = task {
     "vmc update beamstream --path target/scala_%s/".format(buildScalaVersion) ! log
     None
-  }
+  } dependsOn(packageAction)
 }
