@@ -17,24 +17,24 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) with Closur
 
   override def classpathFilter = super.classpathFilter -- "*-sources.jar"
   override def scanDirectories = if (isAutoScan) super.scanDirectories else Nil
-  
+
   // Lift
   lazy val lift_mongodb = "net.liftweb" %% "lift-mongodb-record" % liftVersion
-  
+
   // misc
   lazy val logback = "ch.qos.logback" % "logback-classic" % "0.9.26"
-  
+
   // test-scope
-	lazy val specs = "org.scala-tools.testing" %% "specs" % specsVersion % "test->default"
-	lazy val jetty6 = "org.mortbay.jetty" % "jetty" % "6.1.22" % "test->default"
-	
-	// google-closure plugin
-	override def closureSourcePath: Path = "src" / "main" / "javascript"
-	
-	// less.css plugin
-	override def lessSourceFilter: NameFilter = filter("bootstrap.less") // only compile the main bootstrap file
-	override def lessSourcePath: Path = "src" / "main" / "less"
-	
+  lazy val specs = "org.scala-tools.testing" %% "specs" % specsVersion % "test->default"
+  lazy val jetty6 = "org.mortbay.jetty" % "jetty" % "6.1.22" % "test->default"
+
+  // google-closure plugin
+  override def closureSourcePath: Path = "src" / "main" / "javascript"
+
+  // less.css plugin
+  override def lessSourceFilter: NameFilter = filter("bootstrap.less") // only compile the main bootstrap file
+  override def lessSourcePath: Path = "src" / "main" / "less"
+
 	// Initialize Boot by default
   override def consoleInit =
     """

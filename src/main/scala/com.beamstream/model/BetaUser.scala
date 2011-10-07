@@ -22,7 +22,7 @@ class BetaUser private () extends MongoRecord[BetaUser] with ObjectIdPk[BetaUser
     }
 
     override def validations =
-      valUnique("That email address has already added to the list") _	::
+      valUnique("That email address has already been added to the list") _	::
       valMaxLen(254, "Email must be 254 characters or fewer") _ ::
       super.validations
   }
@@ -43,7 +43,7 @@ class BetaUser private () extends MongoRecord[BetaUser] with ObjectIdPk[BetaUser
 object BetaUser extends BetaUser with MongoMetaRecord[BetaUser] {
   import mongodb.BsonDSL._
 
-  override def collectionName = "user.users"
+  override def collectionName = "user.betausers"
 
   ensureIndex(("email" -> 1), true) // unique email
 

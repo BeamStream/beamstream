@@ -9,6 +9,7 @@ import http.js._
 import JsCmds._
 import JE._
 import common._
+import util.FieldError
 import util.Helpers._
 import scala.xml.NodeSeq
 
@@ -27,17 +28,17 @@ object BetaForm {
       user.validate match {
         case Nil =>
           user.save
-          S.notice("Thanks for signing up!")
-        case errs => S.error(errs)
+          Call("popup", Str("Thanks for signing up!"))
+        case errs => Call("popup", Str(errsToList(errs)))
       }
-
-      Noop
     }
 
     "name=email" #> (SHtml.text(email, email = _)) &
-    "name=role" #> SHtml.selectObj[String](roleList, Full(role), role = _,
-            "class" -> "sel80", "id" -> "country") &
+    "name=role" #> SHtml.selectObj[String](roleList, Full(role), role = _, "class" -> "sel80", "id" -> "country") &
     "name=hidden" #> SHtml.hidden(process)
-
   }
+
+  private def errsToList(errs: List[FieldError]): String =
+    //(<span><p>Please fix the following errors:</p><ul>{errs.flatMap(e => <li>{e.msg}</li>)}</ul></span>).toString
+    (<ul>{errs.flatMap(e => <li>{e.msg}</li>)}</ul>).toString
 }

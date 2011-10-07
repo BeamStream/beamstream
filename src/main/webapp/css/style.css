@@ -17,33 +17,33 @@ html, body, div, span, h1, h2, h3, h4, h5, h6, p, em, img, strong, sub, sup, b, 
 	margin: 0;
 	padding: 0;
 	border: 0;
-	outline: 0;                             
-	vertical-align: baseline;         
-	background: transparent;     
-	font-size: 100%;                     
+	outline: 0;
+	vertical-align: baseline;
+	background: transparent;
+	font-size: 100%;
 }
-a {                                      	     
+a {
 	margin:0;
 	padding:0;
 	font-size:100%;
 	vertical-align:baseline;
 	background:transparent;
 }
-table {						
-	border-collapse: collapse; 
+table {
+	border-collapse: collapse;
 	border-spacing: 0;
 }
 td, td img {
-	vertical-align: top;			
-} 
+	vertical-align: top;
+}
 input, select, button, textarea {
-	margin: 0; 				
-	font-size: 100%; 			
+	margin: 0;
+	font-size: 100%;
 }
 input[type="text"], input[type="password"], textarea {
-	padding: 0; 				
+	padding: 0;
 }
-input[type="checkbox"] { 		
+input[type="checkbox"] {
 	vertical-align: bottom;
 }
 input[type="radio"] {
@@ -61,25 +61,25 @@ sup {
 
 
 html {
-	overflow-y: scroll; 
+	overflow-y: scroll;
 }
 html, body {
-	height: 100%; 
+	height: 100%;
 }
 body {
 	line-height: 1;
 	background: url(/img/body_bg.png) center top repeat-y #5B98BD;
 	color: #6d6d6d;
 	text-align: left;
-	font: 11px Gotham Rounded Book,Tahoma, "Geneva CY", sans-serif; 
+	font: 11px Gotham Rounded Book,Tahoma, "Geneva CY", sans-serif;
 }
 input, select, button, textarea {
 	font-family: Gotham Rounded Book,Tahoma, "Geneva CY", sans-serif;
 }
 label, input[type="button"], input[type="submit"], button {
-	cursor: pointer; 
+	cursor: pointer;
 }
-a, a:visited { 
+a, a:visited {
 	color: #287fc3;
 	text-decoration: underline;
 }
@@ -92,29 +92,29 @@ a:focus, a:active {
 	text-decoration: underline;
 }
 html,body {
-height: 100%; 
+height: 100%;
 
 }
 .lineForm{ float: left;}
-.main { 
+.main {
 
 min-height: 100%;
-background:url(/img/bg_top.png) center 0px repeat-x; 
+background:url(/img/bg_top.png) center 0px repeat-x;
 }
 .main .bg{background:url(/img/bg_top-1.png) center 26px no-repeat; }
-*html .main { 
-height: 100%; 
+*html .main {
+height: 100%;
 }
 
 
-.hFooter { 
-height: 173px; 
+.hFooter {
+height: 173px;
 }
 .header{ height:508px;}
-.footer { 
-background: url(/img/footer_bg.png) left top repeat-x; 
+.footer {
+background: url(/img/footer_bg.png) left top repeat-x;
 color: #fff;
-height: 143px; 
+height: 143px;
 margin-top: -173px;
 font-family:Verdana, Geneva, sans-serif; font-size:12px; color:#acacac;
 padding-top:30px;
@@ -142,7 +142,7 @@ input[type="submit"]{ background:url(/img/btn_red.png) left top no-repeat; width
 input[type="submit"]:hover{background:url(/img/btn_red_hover.png) left top no-repeat;}
 
 .or{ text-align:center; margin:10px 0px 10px 0px;}
-.list_with_facebook{ color:#0e5c87; font-size:13px;  text-shadow: 1px 0px 0px #A1CBE2; font-weight:bold;  line-height:25px; width:470px; margin-left:auto; margin-right: auto;} 
+.list_with_facebook{ color:#0e5c87; font-size:13px;  text-shadow: 1px 0px 0px #A1CBE2; font-weight:bold;  line-height:25px; width:470px; margin-left:auto; margin-right: auto;}
 .list_with_facebook img{ float:right; }
 
 .content{ background:url(/img/line.png) center 225px no-repeat;}
@@ -172,10 +172,10 @@ div.form-container form { margin:10px 0px 20px 34px;height:45px; }
 		.block .bottm .right{width:10px;height:10px;float:right; background: url(/img/b_r.png) right top no-repeat;}
 		.block .bottm .left{width:10px;height:10px;float:left;background: url(/img/b_l.png) left top no-repeat; }
 		.block .bottm .middle{height:10px; margin:0px 10px 0px 10px;background: url(/img/b_m.png) left top repeat-x;}
-		
+
 		.line2{ background:url(/img/line2.png) left top repeat-x; height:1px;}
-		
-		
+
+
 		ul.num{ color:#959595; font-family:Tahoma, Geneva, sans-serif; font-size:16px; margin:30px 20px 0px 0px; min-height:228px;}
 		ul.num li{ padding-left:30px; margin-bottom:10px; list-style-type:none; min-height:21px;}
 		ul.num li.n1{ background:url(/img/1.png) left top no-repeat; }
@@ -183,7 +183,111 @@ div.form-container form { margin:10px 0px 20px 34px;height:45px; }
 		ul.num li.n3{ background:url(/img/3.png) left top no-repeat; }
 		ul.num li.n4{ background:url(/img/4.png) left top no-repeat; }
 		ul.num span{ color:#666666;}
-		
+
 		.google{ float:right;}
 		.facebook{float:right;}
 		.twitter{float:right; width:95px !important;}
+
+
+/* popupstyles */
+#dialog-overlay {
+
+    /* set it to fill the whil screen */
+    width:100%;
+    height:100%;
+
+    /* transparency for different browsers */
+    filter:alpha(opacity=50);
+    -moz-opacity:0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+    background:#000;
+
+    /* make sure it appear behind the dialog box but above everything else */
+    position:absolute;
+    top:0; left:0;
+    z-index:3000;
+
+    /* hide it by default */
+    display:none;
+}
+
+
+#dialog-box {
+
+    /* css3 drop shadow */
+    -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+
+    /* css3 border radius */
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+
+    background:#eee;
+    /* styling of the dialog box, i have a fixed dimension for this demo */
+    width:328px;
+
+    /* make sure it has the highest z-index */
+    position:absolute;
+    z-index:5000;
+
+    /* hide it by default */
+    display:none;
+}
+
+#dialog-box .dialog-content {
+    /* style the content */
+    text-align:left;
+    padding:10px;
+    margin:13px;
+    color:#666;
+    font-family:arial;
+    font-size:11px;
+}
+
+a.button {
+    /* styles for button */
+    margin:10px auto 0 auto;
+    text-align:center;
+    display: block;
+    width:50px;
+    padding: 5px 10px 6px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    line-height: 1;
+
+    /* button color */
+    background-color: #e33100;
+
+    /* css3 implementation :) */
+    /* rounded corner */
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+
+    /* drop shadow */
+    -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+
+    /* text shaow */
+    text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+    border-bottom: 1px solid rgba(0,0,0,0.25);
+    position: relative;
+    cursor: pointer;
+
+}
+
+a.button:hover {
+    background-color: #c33100;
+}
+
+/* extra styling */
+#dialog-box .dialog-content p {
+    font-weight:700; margin:0;
+}
+
+#dialog-box .dialog-content ul {
+    margin:10px 0 10px 20px;
+    padding:0;
+    height:50px;
+}
