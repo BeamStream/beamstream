@@ -1,14 +1,20 @@
 package bootstrap.liftweb
 
+import scala.xml._
+
 import net.liftweb._
 import common._
 import http._
-import sitemap._
-import sitemap.Loc._
 import util._
 import util.Helpers._
 
-import com.beamstream.model.MongoConfig
+import com.beamstream.lib.SmtpMailer
+import com.beamstream.locs.Sitemap
+import com.beamstream.model.{MongoConfig, User}
+
+import com.eltimn.auth.mongo._
+
+import shiro.Shiro
 
 /**
  * A class that's instantiated early and run.  It allows the application
@@ -21,19 +27,34 @@ class Boot extends Loggable {
     // init mongodb
     MongoConfig.init()
 
+    // init auth-mongo
+    AuthRules.authUserMeta.default.set(User)
+
+    // init shiro
+    Shiro.indexURL.default.set(Sitemap.homePath)
+    //Shiro.onLogin.default.set(() => User.loginToken.remove())
+    Shiro.onLogout.default.set(() => User.deleteAllAuthTokens)
+    Shiro.init()
+
+    // config an email sender
+    SmtpMailer.init
+
     // where to search snippet
     LiftRules.addToPackages("com.beamstream")
-    
+
     // set the default htmlProperties
     LiftRules.htmlProperties.default.set((r: Req) => new Html5Properties(r.userAgent))
 
+    /*
+    LiftScreenRules.messageStyles.default.set(() => {
+      case NoticeType.Notice => new UnprefixedAttribute("class", "lift_notice", Null)
+      case NoticeType.Warning => new UnprefixedAttribute("class", "lift_warning", Null)
+      case NoticeType.Error => new UnprefixedAttribute("class", "error", Null)
+    }: PartialFunction[NoticeType.Value, MetaData])
+    */
+
     // Build SiteMap
-    val TopbarGroup = LocGroup("topbar")
-    LiftRules.setSiteMap(SiteMap(List(
-      Menu.i("Home") / "index",
-      Menu.i("About") / "about" >> TopbarGroup,
-      Menu.i("Contact") / "contact" >> TopbarGroup
-    ) :_*))
+    LiftRules.setSiteMap(Sitemap.siteMap)
 
     //Show the spinny image when an Ajax call starts
     LiftRules.ajaxStart =

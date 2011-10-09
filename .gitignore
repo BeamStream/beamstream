@@ -7,3 +7,6 @@ Thumbs.db
 target/
 lib_managed/
 project/
+
+# sublime-text
+*.sublime-*
