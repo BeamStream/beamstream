@@ -25,8 +25,8 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) with Closur
   // misc
   lazy val lift_auth_mongo = "com.eltimn" %% "lift-auth-mongo" % "0.1-SNAPSHOT"
   lazy val logback = "ch.qos.logback" % "logback-classic" % "0.9.26"
-  lazy val commons_collections = "commons-collections" % "commons-collections" % "3.2.1"
-  lazy val commons_logging = "commons-logging" % "commons-logging" % "1.1.1"
+  //lazy val commons_collections = "commons-collections" % "commons-collections" % "3.2.1"
+  //lazy val commons_logging = "commons-logging" % "commons-logging" % "1.1.1"
 
   // test-scope
   lazy val specs = "org.scala-tools.testing" %% "specs" % specsVersion % "test->default"

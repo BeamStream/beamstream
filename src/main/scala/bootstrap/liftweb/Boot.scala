@@ -14,8 +14,6 @@ import com.beamstream.model.{MongoConfig, User}
 
 import com.eltimn.auth.mongo._
 
-import shiro.Shiro
-
 /**
  * A class that's instantiated early and run.  It allows the application
  * to modify lift's environment
@@ -29,12 +27,11 @@ class Boot extends Loggable {
 
     // init auth-mongo
     AuthRules.authUserMeta.default.set(User)
+    AuthRules.indexURL.default.set(Sitemap.homeLoc.path)
+    AuthRules.siteName.default.set("BeamStream")
+    AuthRules.systemEmail.default.set("info@beamstream.com")
+    AuthRules.systemUsername.default.set("BeamStream Staff")
 
-    // init shiro
-    Shiro.indexURL.default.set(Sitemap.homePath)
-    //Shiro.onLogin.default.set(() => User.loginToken.remove())
-    Shiro.onLogout.default.set(() => User.deleteAllAuthTokens)
-    Shiro.init()
 
     // config an email sender
     SmtpMailer.init

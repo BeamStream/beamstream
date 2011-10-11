@@ -3,7 +3,6 @@ package model
 
 import locs.Sitemap
 
-import org.apache.shiro.authc.UsernamePasswordToken
 import org.bson.types.ObjectId
 
 import net.liftweb._
@@ -13,12 +12,13 @@ import mongodb.record.field._
 import record.field._
 import util.FieldContainer
 
-import com.eltimn.auth.mongo.{ProtoAuthUser, ProtoAuthUserMeta}
+import com.eltimn.auth.mongo._
 
 class User private () extends ProtoAuthUser[User] with ObjectIdPk[User] {
   def meta = User
 
   def isRegistered: Boolean = !id.is.isNew
+  def userIdAsString: String = id.toString
 
   object locale extends LocaleField(this) {
     override def displayName = "Locale"
@@ -27,10 +27,6 @@ class User private () extends ProtoAuthUser[User] with ObjectIdPk[User] {
   object timezone extends TimeZoneField(this) {
     override def displayName = "Time Zone"
     override def defaultValue = "America/Chicago"
-  }
-  // email address has been verified by clicking on an AuthToken link
-  object verified extends BooleanField(this) {
-    override def shouldDisplay_? = false
   }
 
   def registerScreenFields = new FieldContainer {
@@ -46,36 +42,38 @@ object User extends User with ProtoAuthUserMeta[User, ObjectId] {
   ensureIndex((email.name -> 1), true)
   ensureIndex((username.name -> 1), true)
 
-  def findByEmail(email: String): Box[User] = find("email", email)
+  def findByEmail(eml: String): Box[User] = find(email.name, eml)
 
-  def findPasswordForUser(login: String): Box[(ObjectId, String)] =
-    findPasswordForUser(login, email.name, password.name) or findPasswordForUser(login, username.name, password.name)
+  override def onLogIn: List[User => Unit] = List(user => User.loginCredentials.remove())
+  override def onLogOut: List[Box[User] => Unit] = List(
+    boxedUser => boxedUser.foreach { u => deleteAllLoginTokens(u.id.is) }
+  )
 
-  def createUser(username: String, email: String, password: String, permissions: List[String]): Box[User] = {
-    val newUser = createRecord
-      .username(username)
-      .email(email)
-      .password(password, true)
-      .permissions(permissions)
-      .save
+  def findByStringId(id: String): Box[User] =
+    if (ObjectId.isValid(id)) find(new ObjectId(id))
+    else Empty
 
-    Full(newUser)
+  override def loginTokenMeta = Full(ObjectIdLoginToken)
+
+  override def logUserInFromToken(id: String): Box[Unit] = findByStringId(id).map { user =>
+    user.verified(true)
+    user.save
+    logUserIn(user, false)
   }
 
-  def deleteAllAuthTokens: Unit = currentUser
-    .foreach { u => AuthToken.deleteAllByUser(u.id.is) }
+  def loginTokenForUserId(uid: ObjectId) = loginTokenMeta.map(ltm => ltm.createForUserId(uid))
 
-  // this is set in auth and signin and used by register
-  //object regUser extends SessionVar[User](User.createRecord)
+  def sendAuthLink(user: User): Unit = loginTokenForUserId(user.id.is).foreach { lt =>
+    sendAuthLink(user.email.is, lt)
+  }
 
   // used during login process
-  object loginToken extends SessionVar[UsernamePasswordToken](new UsernamePasswordToken)
+  object loginCredentials extends SessionVar[LoginCredentials](LoginCredentials(""))
 
-  def createUserFromToken = createRecord.email(loginToken.is.getUsername)
+  def createUserFromCredentials = createRecord.email(loginCredentials.is.email)
 
-  val siteName = "BeamStream"
-  val systemEmail = "info@beamstream.com"
-  val systemUser: User = find("email", systemEmail) openOr {
+  /*
+  val systemUser: User = findByEmail(systemEmail) openOr {
     User.createRecord
       .username("%s Staff".format(siteName))
       .email(systemEmail)
@@ -83,32 +81,7 @@ object User extends User with ProtoAuthUserMeta[User, ObjectId] {
       .password("[.^wOFr&QgZ6dOk6gg?2js_", true)
       .save
   }
-
-  // send an email to the user with a link for authorization
-  def sendAuthLink(user: User) {
-    import net.liftweb.util.Mailer._
-
-    val authToken = AuthToken.createForUser(user.id.is)
-
-    val msgTxt =
-      """
-        |Someone requested a link to change your password on the %s website.
-        |
-        |If you did not request this, you can safely ignore it. It will expire 48 hours from the time this message was sent.
-        |
-        |Follow the link below or copy and paste it into your internet browser.
-        |
-        |%s
-        |
-        |Thanks,
-        |%s Staff
-      """.format(siteName, authToken.authLink, siteName).stripMargin
-
-    sendMail(
-      From(systemUser.fancyEmail),
-      Subject("%s Password Help".format(siteName)),
-      To(user.email.is),
-      PlainMailBodyType(msgTxt)
-    )
-  }
+  */
 }
+
+case class LoginCredentials(val email: String, val isRememberMe: Boolean = false)

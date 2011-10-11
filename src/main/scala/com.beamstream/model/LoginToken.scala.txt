@@ -3,8 +3,6 @@ package model
 
 import locs.Sitemap
 
-//import java.util.Date
-
 import org.joda.time.DateTime
 
 import net.liftweb._
@@ -15,10 +13,8 @@ import mongodb.record.field._
 
 import org.bson.types.ObjectId
 
-import com.eltimn.auth.mongo.UserIdToken
-
-class AuthToken extends MongoRecord[AuthToken] with ObjectIdPk[AuthToken] {
-  def meta = AuthToken
+class LoginToken extends MongoRecord[LoginToken] with ObjectIdPk[LoginToken] {
+  def meta = LoginToken
 
   object userId extends ObjectIdRefField(this, User)
   object expires extends DateField(this) {
@@ -27,19 +23,18 @@ class AuthToken extends MongoRecord[AuthToken] with ObjectIdPk[AuthToken] {
 
   def authLink = S.hostAndPath+"/auth?token="+id.toString
 }
-object AuthToken extends AuthToken with MongoMetaRecord[AuthToken] with shiro.SubjectLifeCycle {
+object LoginToken extends LoginToken with MongoMetaRecord[LoginToken] with Loggable {
   override def collectionName = "user.authtokens"
 
-  def createForUser(uid: ObjectId): AuthToken = {
-    createRecord.userId(uid).save
-  }
+  def createForUserId(uid: ObjectId): LoginToken = createRecord.userId(uid).save
 
-  def deleteAllByUser(userId: ObjectId) {
+  def deleteAllByUserId(userId: ObjectId) {
+    logger.debug("Deleting all LoginTokens for userId: %s".format(userId.toString))
     delete("userId", userId)
   }
 
   def handleToken: Box[LiftResponse] = {
-    var retVar = RedirectResponse(Sitemap.homeUrl)
+    var retVar = RedirectResponse(Sitemap.homeLoc.url)
     S.param("token") match {
       case Full(t) if (ObjectId.isValid(t)) => find(new ObjectId(t)) match {
         case Full(at) if ((new DateTime).getMillis >= (new DateTime(at.expires.value)).getMillis) => {
@@ -52,10 +47,7 @@ object AuthToken extends AuthToken with MongoMetaRecord[AuthToken] with shiro.Su
               u.verified(true)
               u.save
               at.delete_!
-              loginAndDo(new UserIdToken(u.id.is)) {
-                User.loginToken.remove()
-                seeOther
-              }
+
               retVar = RedirectResponse("/set_password") // need new transition page to allow user to select to set a password and/or to "remember me"
             }
             case _ => S.error("User not found.")

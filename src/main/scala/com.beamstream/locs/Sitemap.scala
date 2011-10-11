@@ -1,41 +1,31 @@
 package com.beamstream
 package locs
 
-import model.AuthToken
-
 import net.liftweb._
 import sitemap._
 import sitemap.Loc._
 
-import shiro.Shiro
-import shiro.sitemap.Locs._
+import com.eltimn.auth.mongo._
+import Locs._
 
 object Sitemap {
-  implicit def locPathToShiroPath(in: List[LocPath]): Shiro.Path = in.map(_.pathItem)
-
   // groups
   val TopbarGroup = LocGroup("topbar")
 
   // locations (menu entries)
-  val homeLoc = Menu.i("Home") / "home" >> TopbarGroup
-
-  def homePath: Shiro.Path = homeLoc.path
-  def homeUrl = listToPath(homePath)
-
-  def authLoc = Menu.i("Auth") / "auth" >> RequireNoAuthentication >>
-    EarlyResponse(() => AuthToken.handleToken)
-
-  def logoutLoc = logoutMenu // from shiro.sitemap.Locs
+  val homeLoc = MenuLoc(Menu.i("Home") / "home" >> TopbarGroup)
+  val authLoc = buildAuthLoc
+  val logoutLoc = buildLogoutLoc
 
   private def menus = List(
     Menu.i("Beta") / "index",
-    homeLoc,
+    homeLoc.menu,
     Menu.i("About") / "about" >> TopbarGroup,
     Menu.i("Contact") / "contact" >> TopbarGroup,
     Menu.i("Login") / "login" >> RequireNoAuthentication,
     Menu.i("Register") / "register" >> RequireNoAuthentication,
-    authLoc,
-    logoutLoc
+    authLoc.menu,
+    logoutLoc.menu
   )
 
   /*

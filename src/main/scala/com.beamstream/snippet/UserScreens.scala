@@ -7,8 +7,6 @@ import model._
 
 import scala.xml._
 
-import org.apache.shiro.authc.UsernamePasswordToken
-
 import net.liftweb._
 import common._
 import http.S
@@ -17,29 +15,29 @@ import util.Helpers._
 /*
  * Use for creating a new user.
  */
-object RegisterScreen extends BootstrapScreen with shiro.SubjectLifeCycle {
+object RegisterScreen extends BootstrapScreen {
 
-  object userVar extends ScreenVar(User.createUserFromToken)
+  object userVar extends ScreenVar(User.createUserFromCredentials)
 
   //override def screenTop = Full(<h2 class="alt">Create New User Account</h2>)
 
   addFields(() => userVar.is.registerScreenFields)
 
-  val remember = builder("", User.loginToken.is.isRememberMe)
+  val remember = builder("", User.loginCredentials.is.isRememberMe)
     .help(Text("Remember me when I come back later."))
     .make
 
   override def localSetup {
-    Referer(redirectPath)
+    Referer(Sitemap.homeLoc.url)
   }
 
   def finish() {
     val user = userVar.is
-    val loginToken = new UsernamePasswordToken(user.email.is, user.password.is, remember)
     user.password.hashIt
     user.save
+    User.logUserIn(user, true)
+    //if (remember) ExtSession.createExtSession(user.id.is)
     S.notice("Thanks for signing up!")
-    login(loginToken)
   }
 }
 
