@@ -1,9 +1,14 @@
 import sbt._
 import Process._
 
+import bees.RunCloudPlugin
 import untyped.{ClosureCompilerPlugin, LessCssPlugin}
 
-class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) with ClosureCompilerPlugin with LessCssPlugin {
+class LiftProject(info: ProjectInfo) extends DefaultWebProject(info)
+  with ClosureCompilerPlugin
+  with LessCssPlugin
+  with RunCloudPlugin
+{
   lazy val isAutoScan = systemOptional[Boolean]("autoscan", false).value
   val liftVersion = "2.4-SNAPSHOT"
   val specsVersion = buildScalaVersion match {
@@ -27,6 +32,7 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) with Closur
   lazy val logback = "ch.qos.logback" % "logback-classic" % "0.9.26"
   //lazy val commons_collections = "commons-collections" % "commons-collections" % "3.2.1"
   //lazy val commons_logging = "commons-logging" % "commons-logging" % "1.1.1"
+  lazy val servlet = "javax.servlet" % "servlet-api" % "2.5" % "provided->default"
 
   // test-scope
   lazy val specs = "org.scala-tools.testing" %% "specs" % specsVersion % "test->default"
@@ -39,7 +45,11 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) with Closur
   override def lessSourceFilter: NameFilter = filter("styles.less") // only compile the main file
   override def lessSourcePath: Path = "src" / "main" / "less"
 
-	// Initialize Boot by default
+  // CloudBees
+  override def beesApplicationId = Some("beamstream")
+  override def beesUsername = Some("eltimn")
+
+  // Initialize Boot by default
   override def consoleInit =
     """
       |import bootstrap.liftweb.Boot
@@ -49,7 +59,7 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) with Closur
       |
     """.stripMargin
 
-  lazy val deploy = task {
+  lazy val cfdeploy = task {
     "vmc update beamstream --path target/scala_%s/".format(buildScalaVersion) ! log
     None
   } dependsOn(packageAction)

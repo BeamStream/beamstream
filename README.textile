@@ -5,7 +5,7 @@ To Push to CloudFoundry, you must specify a path so it can find the war:
 
 @vmc update beamstream --path target/scala_2.9.1/@
 
-There is a @deploy@ task defined in sbt that will do this for you. It will only work
+There is a @cfdeploy@ task defined in sbt that will do this for you. It will only work
 after an intial @vmc push@.
 
 

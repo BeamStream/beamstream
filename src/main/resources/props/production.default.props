@@ -1,3 +1,6 @@
 mail.smtp.host=smtp.gmail.com
 mail.smtp.user=beamstreamdev@gmail.com
 mail.smtp.pass=_zTWk72-H1ycfT4pHC8L4Icl
+mongo.default.url=staff.mongohq.com:10089/xctDBEgl8J9rvR1hCJlrLw
+mongo.default.user=cloudbees
+mongo.default.pwd=003fd084878847e6c758267d3dcbc555
