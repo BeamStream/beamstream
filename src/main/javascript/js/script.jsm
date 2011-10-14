@@ -1,8 +1,10 @@
+# bootstrap requires a softlink to the modules/bootstrap directory since directories can't start with ../
+
 libs/jquery-1.6.1.js
-libs/bootstrap-alerts.js
-libs/bootstrap-dropdown.js
-libs/bootstrap-modal.js
-libs/bootstrap-popover.js
-#libs/bootstrap-scrollspy.js
-libs/bootstrap-tabs.js
-libs/bootstrap-twipsy.js
+bootstrap/js/bootstrap-alerts.js
+bootstrap/js/bootstrap-dropdown.js
+bootstrap/js/bootstrap-modal.js
+bootstrap/js/bootstrap-popover.js
+#bootstrap/js/bootstrap-scrollspy.js
+bootstrap/js/bootstrap-tabs.js
+bootstrap/js/bootstrap-twipsy.js
