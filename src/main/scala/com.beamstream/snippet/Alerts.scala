@@ -9,7 +9,7 @@ import http.{Factory, NoticeType, S, SHtml}
 import util.Helpers._
 
 
-object BootstrapAlerts extends Factory {
+object BootstrapAlerts extends Factory with Loggable {
   /*
    * Config
    */
@@ -18,7 +18,13 @@ object BootstrapAlerts extends Factory {
   val noticeTitle = new FactoryMaker[Box[String]](Empty){}
 
   def render = {
-    val notices = S.noIdMessages _
+    val showAll = toBoolean(S.attr("showAll") or S.attr("showall"))
+    val notices =
+      if (showAll) S.messages _
+      else S.noIdMessages _
+
+    logger.debug("showAll: %s".format(showAll.toString))
+
     // Compute the formatted set of messages for a given input
     def computeMessageDiv(args: (List[(NodeSeq, Box[String])], NoticeType.Value)): NodeSeq = args match {
       case (messages, noticeType) =>

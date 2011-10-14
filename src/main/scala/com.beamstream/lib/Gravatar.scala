@@ -1,6 +1,8 @@
 package com.beamstream
 package lib
 
+import scala.xml.NodeSeq
+
 import java.security.{MessageDigest, NoSuchAlgorithmException}
 import java.io.{UnsupportedEncodingException}
 
@@ -9,13 +11,14 @@ import common._
 import http.Factory
 import util.Helpers
 
-object Gravatar extends GravatarUtils with Factory {
+object Gravatar extends Factory with Loggable {
+  /*
+   * config
+   */
   val defaultRating = new FactoryMaker[String]("G") {}
   val defaultSize = new FactoryMaker[Int](42) {}
   val defaultImage = new FactoryMaker[String]("") {}
-}
 
-trait GravatarUtils extends Loggable {
   /**
    * @param email The email address of the recipient
    * @param size The square size of the output gravatar
@@ -24,13 +27,22 @@ trait GravatarUtils extends Loggable {
    */
   def imageUrl(
     email: String,
-    size: Int = Gravatar.defaultSize.vend,
-    rating: String = Gravatar.defaultRating.vend,
-    default: String = Gravatar.defaultImage.vend
+    size: Int = defaultSize.vend,
+    rating: String = defaultRating.vend,
+    default: String = defaultImage.vend
   ): String = {
     val url = "http://www.gravatar.com/avatar/%s?s=%s&r=%s".format(getMD5(email), size.toString, rating)
     if (default.length > 0) "%s&d=%s".format(url, Helpers.urlEncode(default))
     else url
+  }
+
+  def imgTag(
+    email: String,
+    size: Int = defaultSize.vend,
+    rating: String = defaultRating.vend,
+    default: String = defaultImage.vend
+  ): NodeSeq = {
+    <img src={imageUrl(email, size, rating, default)}></img>
   }
 
   def signupUrl(email: String): String =

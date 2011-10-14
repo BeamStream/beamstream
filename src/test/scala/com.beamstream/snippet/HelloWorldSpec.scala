@@ -11,6 +11,7 @@ import util._
 import Helpers._
 import lib._
 
+/*
 object HelloWorldSpec extends Specification {
   val session = new LiftSession("", randomString(20), Empty)
   val stableTime = now
@@ -35,4 +36,4 @@ object HelloWorldSpec extends Specification {
     }
   }
 }
-
+*/

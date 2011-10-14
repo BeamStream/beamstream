@@ -1,44 +1,101 @@
 package com.beamstream
 package snippet
 
-import lib.Gravatar
+import lib.{Gravatar, SnippetHelpers}
 import locs.Sitemap
 import model.{User, LoginCredentials}
 
-import scala.xml.NodeSeq
+import scala.xml._
 
 import net.liftweb._
 import common._
-import http.{S, SHtml, StatefulSnippet}
+import http.{DispatchSnippet, S, SHtml, StatefulSnippet}
 import util._
 import Helpers._
 
-object UserTopbar {
-  def render = {
-    User.currentUser match {
-      case Full(user) =>
-        //<img src={Gravatar.imageUrl(user.email.is, 13)}></img>
-        //<span class="username">{user.username.is}</span>
-        <ul class="nav secondary-nav">
-          <li class="dropdown" data-dropdown="dropdown">
-            <a href="#" class="dropdown-toggle">
-              <!--<img src={Gravatar.imageUrl(user.email.is, 13)}></img>-->
-              <span class="username">{user.username.is}</span>
-            </a>
-            <ul class="dropdown-menu">
-              <li><span lift="Menu.item?name=Settings;donthide=true;linktoself=true">Settings</span></li>
-              <li><span lift="Menu.item?name=About;donthide=true;linktoself=true">Help</span></li>
-              <li class="divider"></li>
-              <li><a href="/logout">Log Out</a></li>
-            </ul>
-          </li>
-        </ul>
-      case _ if (S.request.flatMap(_.location).map(_.name).filterNot(it => List("Login", "Register").contains(it)).isDefined) =>
-        <form action="/login" style="float: right">
-          <button class="btn">Sign In</button>
-        </form>
-      case _ => NodeSeq.Empty
+sealed trait UserSnippet extends DispatchSnippet with SnippetHelpers with Loggable {
+
+  def dispatch = {
+    case "header" => header
+    case "gravatar" => gravatar
+    case "name" => name
+    case "username" => username
+    case "title" => title
+  }
+
+  protected def user: Box[User]
+
+  protected def serve(snip: User => NodeSeq): NodeSeq =
+    (for {
+      u <- user ?~ "User not found"
+    } yield {
+      snip(u)
+    }): NodeSeq
+
+  def header(xhtml: NodeSeq): NodeSeq = serve { user =>
+    <div id="user-header">
+      {gravatar(xhtml)}
+      <h3>{name(xhtml)}</h3>
+    </div>
+  }
+
+  def gravatar(xhtml: NodeSeq): NodeSeq = {
+    val size = S.attr("size").map(toInt) openOr Gravatar.defaultSize.vend
+
+    serve { user =>
+      Gravatar.imgTag(user.email.is, size)
     }
+  }
+
+  def username(xhtml: NodeSeq): NodeSeq = serve { user =>
+    Text(user.username.is)
+  }
+
+  def name(xhtml: NodeSeq): NodeSeq = serve { user =>
+    if (user.name.is.length > 0)
+      Text("%s (%s)".format(user.name.is, user.username.is))
+    else
+      Text(user.username.is)
+  }
+
+  def title(xhtml: NodeSeq): NodeSeq = serve { user =>
+    <lift:head>
+      <title lift="Menu.title">{"BeamStream: %*% - "+user.username.is}</title>
+    </lift:head>
+  }
+}
+
+object CurrentUser extends UserSnippet {
+  override protected def user = User.currentUser
+}
+
+object ProfileLocUser extends UserSnippet {
+  override def dispatch = super.dispatch orElse {
+    case "profile" => profile
+  }
+
+  override protected def user = Sitemap.profileLoc.currentValue
+
+  import java.text.SimpleDateFormat
+
+  val df = new SimpleDateFormat("MMM d, yyyy")
+
+  def profile(xhtml: NodeSeq): NodeSeq = serve { user =>
+    val editLink: NodeSeq =
+      if (User.currentUser.filter(_.id.is == user.id.is).isDefined)
+        <a href={Sitemap.editProfile.url} class="btn info">Edit Your Profile</a>
+      else
+        NodeSeq.Empty
+
+    val cssSel =
+      "#id_avatar *" #> Gravatar.imgTag(user.email.is) &
+      "#id_name *" #> <h3>{user.name.is}</h3> &
+      "#id_location *" #> user.location.is &
+      "#id_whencreated" #> df.format(user.whenCreated.toDate).toString &
+      "#id_bio *" #> user.bio.is &
+      "#id_editlink *" #> editLink
+
+    cssSel.apply(xhtml)
   }
 }
 
@@ -67,17 +124,15 @@ class UserLogin extends StatefulSnippet with Loggable {
 
   private def process(): Unit = S.param("email").map(e => {
     val email = e.toLowerCase.trim
-    // save the password and remember entered
-    val loginCredentials = LoginCredentials(email, remember)
-    User.loginCredentials(loginCredentials) // set session var in case we need it
+    // save the email and remember entered in the session var
+    User.loginCredentials(LoginCredentials(email, remember))
 
     if (hasPassword && email.length > 0 && password.length > 0) {
       User.findByEmail(email) match {
         case Full(user) if (user.password.isMatch(password)) =>
           User.logUserIn(user, true)
-          //if (remember) ExtSession.createExtSession(user.id.is)
-          User.loginCredentials.remove()
-          S.seeOther(Sitemap.homeLoc.url)
+          if (remember) User.createExtSession(user.id.is)
+          S.seeOther(Sitemap.home.url)
         case _ => S.error("Invalid credentials.")
       }
     }
@@ -91,17 +146,46 @@ class UserLogin extends StatefulSnippet with Loggable {
       // see if email exists in the database
       User.findByEmail(email) match {
         case Full(user) => {
-          User.sendAuthLink(user)
+          User.sendLoginToken(user)
           User.loginCredentials.remove()
           S.notice("An email has been sent to you with instructions for accessing your account.")
-          S.seeOther(Sitemap.homeLoc.url)
+          S.seeOther(Sitemap.home.url)
         }
-        case _ => S.seeOther("/register") // send to register page
+        case _ => S.seeOther(Sitemap.register.url)
       }
     }
     else
       S.error("Please enter an email address")
   }) openOr S.error("Please enter an email address")
 
-  private def cancel() = S.seeOther(Sitemap.homeLoc.url)
+  private def cancel() = S.seeOther(Sitemap.home.url)
+}
+
+object UserTopbar {
+  def render = {
+    User.currentUser match {
+      case Full(user) =>
+        <ul class="nav secondary-nav" id="user">
+          <li class="dropdown" data-dropdown="dropdown">
+            <a href="#" class="dropdown-toggle">
+              {Gravatar.imgTag(user.email.is, 20)}
+              <span>{user.username.is}</span>
+            </a>
+            <ul class="dropdown-menu">
+              <!--<li><lift:Menu.item name="User" donthide="true" linktoself="true">Profile</lift:Menu.item></li>-->
+              <li><a href={"/user/%s".format(user.username.is)}>Profile</a></li>
+              <li><lift:Menu.item name="Account" donthide="true" linktoself="true">Settings</lift:Menu.item></li>
+              <li><lift:Menu.item name="About" donthide="true" linktoself="true">Help</lift:Menu.item></li>
+              <li class="divider"></li>
+              <li><a href="/logout">Log Out</a></li>
+            </ul>
+          </li>
+        </ul>
+      case _ if (S.request.flatMap(_.location).map(_.name).filterNot(it => List("Login", "Register").contains(it)).isDefined) =>
+        <form action="/login" style="float: right">
+          <button class="btn">Sign In</button>
+        </form>
+      case _ => NodeSeq.Empty
+    }
+  }
 }

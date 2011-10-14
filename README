@@ -1,4 +1,0 @@
-
-To Push to CloudFoundry, you must specify a path so it can find the war:
-
-vmc update beamstream --path target/scala_2.9.1/

@@ -1,4 +1,4 @@
-/* Override some defaults */
+// Override some defaults
 html, body {
   background-color: #eee;
 }
@@ -8,11 +8,13 @@ body {
 .container > footer p {
   text-align: center; /* center align it with the container */
 }
+/*
 .container {
-  width: 820px; /* downsize our container to make the content feel a bit tighter and more cohesive. NOTE: this removes two full columns from the grid, meaning you only go to 14 columns and not 16. */
+  width: 820px; // downsize our container to make the content feel a bit tighter and more cohesive. NOTE: this removes two full columns from the grid, meaning you only go to 14 columns and not 16.
 }
+*/
 
-/* The white background content wrapper */
+// The white background content wrapper
 .content {
   background-color: #fff;
   padding: 20px;
@@ -25,14 +27,50 @@ body {
           box-shadow: 0 1px 2px rgba(0,0,0,.15);
 }
 
-/* Page header tweaks */
+// Page header tweaks
 .page-header {
   background-color: #f5f5f5;
   padding: 20px 20px 10px;
   margin: -20px -20px 20px;
 }
 
-/* For messages in forms */
+// For messages in forms
 .lift_error {
   color: @red;
+}
+
+#user img {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  vertical-align: top;
+  margin-right: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+#user-header {
+  line-height: 4em;
+
+  img {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+    border: none;
+    cursor: pointer;
+  }
+
+  h3 {
+    display: inline-block;
+  }
+}
+
+div.gravatar {
+  float:left;
+  margin-left:10px;
+  max-width: 320px;
+
+  img {
+    padding-top:10px;
+  }
 }

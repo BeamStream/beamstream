@@ -1,0 +1,25 @@
+
+h2. CloudFoundry
+
+To Push to CloudFoundry, you must specify a path so it can find the war:
+
+@vmc update beamstream --path target/scala_2.9.1/@
+
+There is a @deploy@ task defined in sbt that will do this for you. It will only work
+after an intial @vmc push@.
+
+
+h2. Twitter Bootstrap
+
+Bootstrap is included via a git submodule. When first checking out this project
+you must run:
+
+@git submodule init@
+
+This will pull in the necessary files.
+
+To update the version that is being used, you must run @git fetch/pull@ in the submodule
+directory, then commit the version the submodule is using to the main project. For
+more information, see:
+
+"understanding-git-submodules":http://speirs.org/blog/2009/5/11/understanding-git-submodules.html

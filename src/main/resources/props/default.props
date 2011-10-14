@@ -1,3 +1,9 @@
 mail.smtp.host=smtp.gmail.com
-mail.smtp.user=support@rotozen.com
-mail.smtp.pass=wo59ods!
+mail.smtp.user=beamstreamdev@gmail.com
+mail.smtp.pass=_zTWk72-H1ycfT4pHC8L4Icl
+#mongo.default.url=dbh63.mongolab.com:27637/beamstream_dev
+#mongo.default.user=beamstream
+#mongo.default.pwd=beamstream
+#mongo.default.host=dbh63.mongolab.com
+#mongo.default.port=27637
+#mongo.default.name=beamstream_dev

@@ -36,7 +36,7 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info) with Closur
   override def closureSourcePath: Path = "src" / "main" / "javascript"
 
   // less.css plugin
-  override def lessSourceFilter: NameFilter = filter("bootstrap.less") // only compile the main bootstrap file
+  override def lessSourceFilter: NameFilter = filter("styles.less") // only compile the main file
   override def lessSourcePath: Path = "src" / "main" / "less"
 
 	// Initialize Boot by default

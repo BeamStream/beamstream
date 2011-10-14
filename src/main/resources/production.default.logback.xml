@@ -8,14 +8,14 @@
   </appender>
 
   <appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
-    <SMTPHost></SMTPHost>
-    <SMTPPort></SMTPPort>
-    <SSL></SSL>
-    <Username></Username>
-    <Password></Password>
-    <To></To>
-    <From></From>
-    <Subject>Production: %logger{20} - %m</Subject>
+    <SMTPHost>smtp.gmail.com</SMTPHost>
+    <SMTPPort>465</SMTPPort>
+    <SSL>true</SSL>
+    <Username>beamstreamdev@gmail.com</Username>
+    <Password>_zTWk72-H1ycfT4pHC8L4Icl</Password>
+    <To>tnelly27@gmail.com</To>
+    <From>beamstreamdev@gmail.com</From>
+    <Subject>BeamStream Production: %logger{20} - %m</Subject>
 
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>ERROR</level>
