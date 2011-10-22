@@ -95,16 +95,16 @@ function()
 <!-- opop dialog box -->
 <div id="dialog-overlay"></div>
 <div id="dialog-box">
-    <div class="dialog-content">
-        <div id="dialog-message"></div>
-        <a href="#" class="button">Close</a>
-    </div>
+  <div class="dialog-content">
+    <div id="dialog-message"></div>
+    <a href="#" class="button">Close</a>
+  </div>
 </div>
 
 <p align="center"><img src="/img/join_bs.png" /></p>
 
 <div class="form-container">
-<form class="lift:form.ajax join_vip_list">
+<form lift="form.ajax" class="join_vip_list">
 <div lift="BetaForm">
   <input name="email" type="text" onFocus="this.value=''" onBlur="if (this.value==''){this.value='E-mail'}" />
   <div class="lineForm">
@@ -126,7 +126,22 @@ function()
 </div>
 
 <div  class="or"><img src="/img/or.png" /></div>
-<div class="list_with_facebook"><img src="/img/fb.png" width="181" height="25" />Join the Beam Beta List with Facebook </div>
+<div class="list_with_facebook">
+  <!--<img src="/img/fb.png" width="181" height="25" />Join the Beam Beta List with Facebook-->
+  <!--<span lift="SignUp.FacebookNormal"></span>-->
+  <span lift="Facebook.link"/></span>
+
+  <!--
+  <iframe src="https://www.facebook.com/plugins/registration.php?client_id=206389419434913&redirect_uri=https://www.beamstream.com&fields=name,first_name,last_name,birthday,gender,location,email"
+    scrolling="auto"
+    frameborder="no"
+    style="border:none"
+    allowTransparency="true"
+    width="100%"
+    height="330">
+  </iframe>
+  -->
+</div>
 
 <div class="coming_soon">Long ago, our ancestors learned in tribes called classes, from just one leader. The time has come for students &amp; teachers to evolve a new model of higher education: learning from &amp; teaching each other. The <strong>BeamStream</strong> social eLearning era, <strong>BSE</strong> is now upon us.</div>
 <div class="line_block">

@@ -19,7 +19,7 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info)
 
   // Repos
   //val scalatoolsSnapshot = ScalaToolsSnapshots
-  val shiroSnapshots = "Shiro Snapshots" at "https://repository.apache.org/content/repositories/snapshots/"
+  //val liftmodulesReleases = "Liftmodules repo" at "https://repository-liftmodules.forge.cloudbees.com/release"
 
   override def classpathFilter = super.classpathFilter -- "*-sources.jar"
   override def scanDirectories = if (isAutoScan) super.scanDirectories else Nil
@@ -27,16 +27,24 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info)
   // Lift
   lazy val lift_mongodb = "net.liftweb" %% "lift-mongodb-record" % liftVersion
 
+  // Liftmodules
+  val lift_omniauth = "net.liftmodules" %% "omniauth" % "2.4-SNAPSHOT-0.6"
+
   // misc
   lazy val lift_auth_mongo = "com.eltimn" %% "lift-auth-mongo" % "0.1-SNAPSHOT"
   lazy val logback = "ch.qos.logback" % "logback-classic" % "0.9.26"
   //lazy val commons_collections = "commons-collections" % "commons-collections" % "3.2.1"
   //lazy val commons_logging = "commons-logging" % "commons-logging" % "1.1.1"
-  lazy val servlet = "javax.servlet" % "servlet-api" % "2.5" % "provided->default"
+  lazy val servlet = "javax.servlet" % "servlet-api" % "2.5" % "provided"
+  lazy val scribe = "org.scribe" % "scribe" % "1.2.3"
+
+  lazy val dispatch = "net.databinder" %% "dispatch-core" % "0.8.5"
+  lazy val dispatch_http = "net.databinder" %% "dispatch-http" % "0.8.5"
+  lazy val dispatch_json = "net.databinder" %% "dispatch-lift-json" % "0.8.5" intransitive()
 
   // test-scope
-  lazy val specs = "org.scala-tools.testing" %% "specs" % specsVersion % "test->default"
-  lazy val jetty6 = "org.mortbay.jetty" % "jetty" % "6.1.22" % "test->default"
+  lazy val specs = "org.scala-tools.testing" %% "specs" % specsVersion % "test"
+  lazy val jetty6 = "org.mortbay.jetty" % "jetty" % "6.1.22" % "test"
 
   // google-closure plugin
   override def closureSourcePath: Path = "src" / "main" / "javascript"
@@ -50,6 +58,7 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info)
   override def beesUsername = Some("eltimn")
 
   // Initialize Boot by default
+  /*
   override def consoleInit =
     """
       |import bootstrap.liftweb.Boot
@@ -58,6 +67,7 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info)
       |b.boot
       |
     """.stripMargin
+  */
 
   lazy val cfdeploy = task {
     "vmc update beamstream --path target/scala_%s/".format(buildScalaVersion) ! log

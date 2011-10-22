@@ -24,6 +24,31 @@
 </head>
 
 <body>
+<!--
+<div id="fb-root"></div>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '291234827561426', // App ID
+      //channelURL : 'www.beamstream.com/channel.html', // Channel File
+      status     : true, // check login status
+      cookie     : true, // enable cookies to allow the server to access the session
+      oauth      : true, // enable OAuth 2.0
+      xfbml      : true  // parse XFBML
+    });
+
+    // Additional initialization code here
+  };
+
+  // Load the SDK Asynchronously
+  (function(d){
+     var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
+     js = d.createElement('script'); js.id = id; js.async = true;
+     js.src = "//connect.facebook.net/en_US/all.js";
+     d.getElementsByTagName('head')[0].appendChild(js);
+   }(document));
+</script>
+-->
 <div class="main">
 <div class="bg">
 
@@ -62,14 +87,11 @@
         <div class="social_sites">
         <div class="social_sites">
           <div class="twitter"><a href="http://twitter.com/#!/beamstream" class="twitter-follow-button" data-show-count="horizontal">Follow</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></div>
-          <div id="fb-root"></div>
-          <script>(function(d, s, id) {
-            var js, fjs = d.getElementsByTagName(s)[0];
-            if (d.getElementById(id)) {return;}
-            js = d.createElement(s); js.id = id;
-            js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
-            fjs.parentNode.insertBefore(js, fjs);
-          }(document, 'script', 'facebook-jssdk'));</script>
+          <!--
+          <div class="fb-like" style="border:none; overflow:hidden; width:100px; height:21px;"
+            data-href="www.beamstream.com" data-send="false" data-width="100"
+            data-show-faces="false" data-layout="button_count" data-show-faces="false"></div>
+          -->
           <!--<div class="fb-like" data-href="http://www.facebook.com/pages/BeamStream/100810133312475" data-send="false" data-width="450" data-show-faces="true"></div>
           <div class="facebook" style="text-align:left"><script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
             <fb:like style="border:none; overflow:hidden; width:100px; height:21px;" locale="en_US" lang="en_US" show_faces="false" action="like" layout="button_count"></fb:like>

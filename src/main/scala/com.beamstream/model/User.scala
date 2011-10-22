@@ -3,22 +3,82 @@ package model
 
 import locs.Sitemap
 
+import scala.xml.Text
+import java.util.TimeZone
+
 import org.bson.types.ObjectId
 import org.joda.time.DateTime
 
 import net.liftweb._
 import common._
 import http.{LiftResponse, RedirectResponse, Req, S, SessionVar}
+import json._
 import mongodb.record.field._
-import record.field._
-import util.FieldContainer
+import record.field.{PasswordField => _, _}
+import util.{FieldContainer, FieldError, Helpers}
 
 import com.eltimn.auth.mongo._
 
-class User private () extends ProtoAuthUser[User] with ObjectIdPk[User] {
+class User private () extends MongoAuthUser[User] with ObjectIdPk[User] {
   def meta = User
 
   def userIdAsString: String = id.toString
+
+  object username extends StringField(this, 32) {
+    override def displayName = "Username"
+    override def setFilter = trim _ :: super.setFilter
+
+    private def valUnique(msg: => String)(value: String): List[FieldError] = {
+      if (value.length > 0)
+        meta.findAll(name, value).filterNot(_.id.is == owner.id.is).map(u =>
+          FieldError(this, Text(msg))
+        )
+      else
+        Nil
+    }
+
+    override def validations =
+      valUnique("Another user is already using that username, please enter a different one") _ ::
+      valMinLen(3, "Username must be at least 3 characters") _ ::
+      valMaxLen(32, "Username must be less than 33 characters") _ ::
+      super.validations
+  }
+
+  /*
+  * http://www.dominicsayers.com/isemail/
+  */
+  object email extends EmailField(this, 254) {
+    override def displayName = "Email"
+    override def setFilter = trim _ :: toLower _ :: super.setFilter
+
+    private def valUnique(msg: => String)(value: String): List[FieldError] = {
+      owner.meta.findAll(name, value).filter(_.id.is != owner.id.is).map(u =>
+        FieldError(this, Text(msg))
+      )
+    }
+
+    override def validations =
+      valUnique("That email address is already registered with us") _  ::
+      valMaxLen(254, "Email must be 254 characters or less") _ ::
+      super.validations
+  }
+  // email address has been verified
+  object verified extends BooleanField(this) {
+    override def displayName = "Verified"
+  }
+  object password extends PasswordField(this, 6, 32, Empty) {
+    override def displayName = "Password"
+  }
+  object permissions extends PermissionListField(this)
+  object roles extends ObjectIdRefListField(this, Role) {
+    def permissions: List[Permission] = objs.flatMap(_.permissions.is)
+    def names: List[String] = objs.map(_.id.is)
+  }
+
+  lazy val authPermissions: Set[Permission] = (permissions.is ::: roles.permissions).toSet
+  lazy val authRoles: Set[String] = roles.names.toSet
+
+  lazy val fancyEmail = AuthUtil.fancyEmail(username.is, email.is)
 
   object locale extends LocaleField(this) {
     override def displayName = "Locale"
@@ -50,6 +110,15 @@ class User private () extends ProtoAuthUser[User] with ObjectIdPk[User] {
       valMaxLen(160, "Bio must be 160 characters or less") _ ::
       super.validations
   }
+  object gender extends StringField(this, 64) {
+    override def displayName = "Gender"
+
+    override def validations =
+      valMaxLen(64, "Name must be 64 characters or less") _ ::
+      super.validations
+  }
+
+  object facebookId extends IntField(this)
 
   /*
    * FieldContainers for various LiftScreeens.
@@ -76,13 +145,34 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
 
   ensureIndex((email.name -> 1), true)
   ensureIndex((username.name -> 1), true)
+  ensureIndex((facebookId.name -> 1))
 
-  def findByEmail(eml: String): Box[User] = find(email.name, eml)
-  def findByUsername(uname: String): Box[User] = find(username.name, uname)
+  def findByEmail(in: String): Box[User] = find(email.name, in)
+  def findByUsername(in: String): Box[User] = find(username.name, in)
+  def findByFacebookId(in: Int): Box[User] = find(facebookId.name, in)
 
   def findByStringId(id: String): Box[User] =
     if (ObjectId.isValid(id)) find(new ObjectId(id))
     else Empty
+
+  def fromFacebookJson(in: JValue): Box[User] = {
+    Helpers.tryo(in transform {
+      case JField("id", JString(id)) => JField("facebookId", JInt(Helpers.toInt(id)))
+      case JField("location", JObject(List(JField("facebookId", JInt(id)), JField("name", JString(name))))) =>
+        JField("location", JString(name))
+      case JField("timezone", JInt(offset)) =>
+        val offId = "GMT" + (
+          if (offset > 0)
+            "+%s".format(offset.toString)
+          else
+            "%s".format(offset.toString)
+        )
+        JField("timezone", JString(TimeZone.getTimeZone(offId).getID))
+    }) flatMap { jv =>
+      logger.debug(pretty(render(jv)))
+      fromJValue(jv)
+    }
+  }
 
   override def onLogIn: List[User => Unit] = List(user => User.loginCredentials.remove())
   override def onLogOut: List[Box[User] => Unit] = List(
@@ -100,7 +190,7 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
   private lazy val siteName = AuthRules.siteName.vend
   private lazy val sysUsername = AuthRules.systemUsername.vend
   private lazy val indexUrl = AuthRules.indexUrl.vend
-  private lazy val afterloginTokenUrl = AuthRules.afterloginTokenUrl.vend
+  private lazy val loginTokenAfterUrl = AuthRules.loginTokenAfterUrl.vend
 
   /*
    * LoginToken
@@ -120,7 +210,7 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
         at.delete_!
       }
       case Full(at) => logUserInFromToken(at.userId.is) match {
-        case Full(_) => respUrl = afterloginTokenUrl.toString
+        case Full(_) => respUrl = loginTokenAfterUrl.toString
         case _ => S.error("User not found")
       }
       case _ => S.warning("Login token not provided")
@@ -176,7 +266,7 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
           case Full(es) => logUserInFromExtSession(es.userId.is)
           case Failure(msg, _, _) =>
             logger.warn("Error logging user in with ExtSession: %s".format(msg))
-          case Empty =>
+          case Empty => // cookie is not set
         }
       }
     }

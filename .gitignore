@@ -10,3 +10,6 @@ project/
 
 # sublime-text
 *.sublime-*
+
+# symlink
+/src/main/javascript/js/bootstrap

@@ -12,6 +12,8 @@ import sitemap.Loc._
 import com.eltimn.auth.mongo.{Locs, Path}
 import Locs._
 
+import omniauth.Omniauth
+
 object MenuGroups {
   val SettingsGroup = LocGroup("settings")
   val TopBarGroup = LocGroup("topbar")
@@ -61,7 +63,7 @@ object Sitemap {
     Menu.i("Throw") / "throw" >> Hidden,
     Menu.i("Error") / "error" >> Hidden,
     Menu.i("404") / "404" >> Hidden
-  )
+  ) //::: Omniauth.sitemap
 
   /*
    * Return a SiteMap needed for Lift
