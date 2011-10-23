@@ -1,7 +1,7 @@
 package com.beamstream
 package snippet
 
-import lib.{Gravatar, SnippetHelpers}
+import lib.{App, Gravatar, SnippetHelpers}
 import locs.Sitemap
 import model.{User, LoginCredentials}
 
@@ -181,6 +181,7 @@ object UserTopbar {
             </ul>
           </li>
         </ul>
+      case _ if (App.isPreBeta) => NodeSeq.Empty
       case _ if (S.request.flatMap(_.location).map(_.name).filterNot(it => List("Login", "Register").contains(it)).isDefined) =>
         <form action="/login" style="float: right">
           <button class="btn">Sign In</button>
@@ -188,4 +189,12 @@ object UserTopbar {
       case _ => NodeSeq.Empty
     }
   }
+}
+
+object UserDebug {
+  def render =
+    <div>
+      User.currentUserId: {User.currentUserId.toString}<br />
+      User.currentUser: {User.currentUser.toString}<br />
+    </div>
 }

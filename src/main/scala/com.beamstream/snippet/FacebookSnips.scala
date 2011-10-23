@@ -19,9 +19,4 @@ object Facebook extends Loggable {
   //def link = SHtml.link(authUrl, handleLogin, Text("FB Auth"))
   def link = <a href={authUrl}>Login With Facebook</a>
 
-  private def handleLogin(): Unit = {
-    val code = S.param("code")
-    logger.debug("code: "+code.toString)
-    S.redirectTo("/home")
-  }
 }

@@ -94,6 +94,5 @@ class Boot extends Loggable {
       logger.debug("Omniauth: "+Omniauth.currentAuth.map(ai => { ai.data.map(d => pretty(render(d))).getOrElse("") } ))
     })
     */
-
   }
 }

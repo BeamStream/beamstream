@@ -156,19 +156,21 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
     else Empty
 
   def fromFacebookJson(in: JValue): Box[User] = {
-    Helpers.tryo(in transform {
-      case JField("id", JString(id)) => JField("facebookId", JInt(Helpers.toInt(id)))
-      case JField("location", JObject(List(JField("facebookId", JInt(id)), JField("name", JString(name))))) =>
-        JField("location", JString(name))
-      case JField("timezone", JInt(offset)) =>
-        val offId = "GMT" + (
-          if (offset > 0)
-            "+%s".format(offset.toString)
-          else
-            "%s".format(offset.toString)
-        )
-        JField("timezone", JString(TimeZone.getTimeZone(offId).getID))
-    }) flatMap { jv =>
+    Helpers.tryo(
+      in transform {
+        case JField("id", JString(id)) => JField("facebookId", JInt(Helpers.toInt(id)))
+        case JField("location", JObject(List(JField("facebookId", JInt(id)), JField("name", JString(name))))) =>
+          JField("location", JString(name))
+        case JField("timezone", JInt(offset)) =>
+          val offId = "GMT" + (
+            if (offset > 0)
+              "+%s".format(offset.toString)
+            else
+              "%s".format(offset.toString)
+          )
+          JField("timezone", JString(TimeZone.getTimeZone(offId).getID))
+      }
+    ) flatMap { jv =>
       logger.debug(pretty(render(jv)))
       fromJValue(jv)
     }
@@ -274,6 +276,7 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
 
   // used during login process
   object loginCredentials extends SessionVar[LoginCredentials](LoginCredentials(""))
+  object regUser extends SessionVar[User](createRecord)
 
   def createUserFromCredentials = createRecord.email(loginCredentials.is.email)
 }

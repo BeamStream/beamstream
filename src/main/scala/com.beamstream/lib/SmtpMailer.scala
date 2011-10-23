@@ -8,11 +8,11 @@ import net.liftweb._
 import common._
 import util._
 
+/*
+ * A Mailer config object that uses Props and auto configures for gmail
+ * if detected.
+ */
 object SmtpMailer extends Loggable {
-  /*
-   * A Mailer config object that uses Props and auto configures for gmail
-   * if detected.
-   */
   def init(): Unit = {
 
     var isAuth = Props.get("mail.smtp.auth", "false").toBoolean

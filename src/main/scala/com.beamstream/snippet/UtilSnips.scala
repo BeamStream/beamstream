@@ -1,9 +1,12 @@
 package com.beamstream
 package snippet
 
+import lib.App
+
 import scala.xml.NodeSeq
 
 import net.liftweb._
+import http.S
 import util.Props
 
 object ShowInProductionOnly {
@@ -13,6 +16,15 @@ object ShowInProductionOnly {
 }
 
 object ThrowException {
+  def render = {
+    val msg = "This is only a test."
+    S.error(msg)
+    throw new Exception(msg)
+  }
+}
+
+object HomePage {
   def render =
-    throw new Exception("This is only a test.")
+    if (App.isPreBeta) <lift:embed what="/index-prebeta" />
+    else <lift:embed what="/index-main" />
 }

@@ -83,8 +83,7 @@ object FacebookGraphApi extends Factory with Loggable {
       case (400, _, _, out) =>
         val err = FacebookError.fromString(out())
         Failure(err.message)
-      case (200, _, _, out) =>
-        Full(JsonParser.parse(out()))
+      case (200, _, _, out) => Full(JsonParser.parse(out()))
       case (status, b, c, out) =>
         //logger.debug("b: "+b.toString)
         //logger.debug("c: "+c.toString)
@@ -109,7 +108,7 @@ object FacebookGraphApi extends Factory with Loggable {
         f(at)
     }
   }
-  /*
+
   def meWithToken: Box[JValue] = doWithToken {
     token => me(token)
   }
@@ -118,8 +117,8 @@ object FacebookGraphApi extends Factory with Loggable {
     token => me(token, obj)
   }
 
-  def obj(id: String): Box[JValue] = doReq(baseReq / id)
-  */
+  //def obj(id: String): Box[JValue] = doReq(baseReq / id)
+
 }
 
 case class AccessToken(val value: String, code: String, val expires: DateTime) {

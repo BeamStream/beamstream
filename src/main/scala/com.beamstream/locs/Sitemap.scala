@@ -1,6 +1,7 @@
 package com.beamstream
 package locs
 
+import lib.App
 import model.User
 
 import net.liftweb._
@@ -31,8 +32,11 @@ case class MenuLoc(menu: Menu) {
 object Sitemap {
   import MenuGroups._
 
+  private val preBetaHome = MenuLoc(Menu.i("Home") / "index")
+
+
   // locations (menu entries)
-  val home = MenuLoc(Menu.i("Home") / "home" >> TopBarGroup)
+  val home = MenuLoc(Menu.i("Home") / "index" >> TopBarGroup)
   val loginToken = MenuLoc(buildLoginTokenMenu)
   val logout = MenuLoc(buildLogoutMenu)
   private val profileParamMenu = Menu.param[User]("User", "Profile",
@@ -46,10 +50,16 @@ object Sitemap {
   val account = MenuLoc(Menu.i("Account") / "settings" / "account" >> SettingsGroup >> RequireLoggedIn)
   val editProfile = MenuLoc(Menu("EditProfile", "Profile") / "settings" / "profile" >> SettingsGroup >> RequireLoggedIn)
   val register = MenuLoc(Menu.i("Register") / "register" >> RequireNotLoggedIn)
+  val error = MenuLoc(Menu.i("Error") / "error" >> Hidden)
 
-  private def menus = List(
-    Menu.i("Beta") / "index",
+  private def commonMenus = List(
     home.menu,
+    Menu.i("Throw") / "throw" >> Hidden,
+    error.menu,
+    Menu.i("404") / "404" >> Hidden
+  )
+
+  private def mainMenus = List(
     Menu.i("Login") / "login" >> RequireNotLoggedIn,
     register.menu,
     loginToken.menu,
@@ -59,14 +69,13 @@ object Sitemap {
     password.menu,
     editProfile.menu,
     Menu.i("About") / "about" >> TopBarGroup,
-    Menu.i("Contact") / "contact" >> TopBarGroup,
-    Menu.i("Throw") / "throw" >> Hidden,
-    Menu.i("Error") / "error" >> Hidden,
-    Menu.i("404") / "404" >> Hidden
-  ) //::: Omniauth.sitemap
+    Menu.i("Contact") / "contact" >> TopBarGroup
+  )
 
   /*
    * Return a SiteMap needed for Lift
    */
-  def siteMap: SiteMap = SiteMap(menus:_*)
+  def siteMap: SiteMap =
+    if (App.isPreBeta) SiteMap(commonMenus:_*)
+    else SiteMap(commonMenus ::: mainMenus :_*)
 }
