@@ -53,7 +53,7 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info)
 
   // CloudBees
   override def beesApplicationId = Some("beamstream")
-  override def beesUsername = Some("eltimn")
+  override def beesUsername = Some("beamstream")
 
   // Initialize Boot by default
   /*
