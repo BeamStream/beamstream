@@ -1,5 +1,5 @@
-<!doctype html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
 
@@ -24,56 +24,31 @@
 </head>
 
 <body>
-<!--
-<div id="fb-root"></div>
-<script>
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '291234827561426', // App ID
-      //channelURL : 'www.beamstream.com/channel.html', // Channel File
-      status     : true, // check login status
-      cookie     : true, // enable cookies to allow the server to access the session
-      oauth      : true, // enable OAuth 2.0
-      xfbml      : true  // parse XFBML
-    });
-
-    // Additional initialization code here
-  };
-
-  // Load the SDK Asynchronously
-  (function(d){
-     var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
-     js = d.createElement('script'); js.id = id; js.async = true;
-     js.src = "//connect.facebook.net/en_US/all.js";
-     d.getElementsByTagName('head')[0].appendChild(js);
-   }(document));
-</script>
--->
 <div class="main">
 <div class="bg">
 
   <div class="header">
-  <div class="site_width">
-    <div class="quick_links">
-      <a href="mailto:info@beamstream.com">Contact us</a>
-      <!--<a href="#">Our Blog</a>-->
+    <div class="site_width">
+      <div class="quick_links">
+        <a href="mailto:info@beamstream.com">Contact us</a>
+        <!--<a href="#">Our Blog</a>-->
+      </div>
+      <div class="logo"><a href="/index"><h1>BeamStream</h1></a></div>
     </div>
-    <div class="logo"><a href="/index"><h1>BeamStream</h1></a></div>
-  </div>
   </div>
 
   <div class="content">
-  <div class="site_width">
-    <div lift="Msgs?showAll=true">
-      <lift:error_class>error</lift:error_class>
-      <lift:notice_class>notice</lift:notice_class>
-      <lift:warn_class>warn</lift:warn_class>
+    <div class="site_width">
+      <div lift="Msgs?showAll=true">
+        <lift:error_class>error</lift:error_class>
+        <lift:notice_class>notice</lift:notice_class>
+        <lift:warn_class>warn</lift:warn_class>
+      </div>
+
+      <lift:bind name="content"></lift:bind>
+
+      <div class="hFooter"></div>
     </div>
-
-    <lift:bind name="content"></lift:bind>
-
-    <div class="hFooter"></div>
-  </div>
   </div>
 
   <div class="footer">
@@ -104,7 +79,28 @@
     <a href="mailto:info@beamstream.com">Contact us</a><!--  |  <a href="">Our Blog</a>-->
     <p class="copy">Copyright &copy; 2011 Beamstream.</p>
     <div lift="UserDebug"></div>
-</div>
+  </div>
+</div><!-- /bg -->
+</div><!-- /main -->
+<!--
+sets current access token if the user is logged in,
+connected to facebook and the current access token is empty
+-->
+<div lift="Facebook.checkAuthToken">
+  <div lift="embed?what=/templates-hidden/parts/fb-init"></div>
+  <script type="text/javascript">
+    BeamStream.facebook.init(Input, function() {
+      FB.getLoginStatus(function(response) {
+        if (response.authResponse) {
+          BeamStream.api.facebook.init(response.authResponse, function(data) {
+            if (data.alert) {
+              console.log(data.alert.level+": "+data.alert.message);
+            }
+          })
+        }
+      })
+    });
+  </script>
 </div>
 </body>
 </html>

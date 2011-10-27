@@ -13,6 +13,8 @@ import http.{LiftScreen, S}
 import util.FieldError
 import util.Helpers._
 
+import com.eltimn.auth.mongo.Role
+
 /*
  * Use for editing the currently logged in user only.
  */
@@ -66,9 +68,6 @@ object PasswordScreen extends BaseCurrentUserScreen with BasePasswordScreen {
   }
 }
 
-/*
- * Use for editing the currently logged in user only.
- */
 object ProfileScreen extends BaseCurrentUserScreen {
   def gravatarHtml =
     <span>
@@ -95,7 +94,7 @@ object ProfileScreen extends BaseCurrentUserScreen {
 
 // this is needed to keep these fields and the password fields in the proper order
 trait BaseRegisterScreen extends BaseScreen {
-  object userVar extends ScreenVar(User.createUserFromCredentials)
+  object userVar extends ScreenVar(User.regUser.is)
 
   addFields(() => userVar.is.registerScreenFields)
 }
@@ -111,7 +110,7 @@ object RegisterScreen extends BaseRegisterScreen with BasePasswordScreen {
     .make
 
   override def localSetup {
-    Referer(Sitemap.home.url)
+    Referer(User.loginContinueUrl.is)
   }
 
   def finish() {
@@ -119,8 +118,55 @@ object RegisterScreen extends BaseRegisterScreen with BasePasswordScreen {
     user.password(passwordField.is)
     user.password.hashIt
     user.save
-    User.logUserIn(user, true)
-    if (rememberMe) User.createExtSession(user.id.is)
+    User.logUserIn(user, true, rememberMe)
+    S.notice("Thanks for signing up!")
+  }
+}
+
+object FacebookRegisterScreen extends BaseScreen {
+  object userVar extends ScreenVar(User.regUser.is)
+
+  override def localSetup {
+    Referer(User.loginContinueUrl.is)
+  }
+
+  addFields(() => userVar.is.facebookRegisterScreenFields)
+
+  val roleList: List[String] = User.standardRoles.map(r => r.id.is)
+
+  val role = select[String]("I'm a", roleList(0), roleList)
+
+  val rememberMe = builder("", User.loginCredentials.is.isRememberMe)
+    .help(Text("Remember me when I come back later."))
+    .make
+
+  def finish() {
+    val user = userVar.is
+    user.roles(List(role: String))
+    user.save
+    User.logUserIn(user, true, rememberMe)
+    S.notice("Thanks for signing up!")
+  }
+}
+
+object FacebookPopupRegisterScreen extends BaseScreen {
+  object userVar extends ScreenVar(User.regUser.is)
+
+  override def localSetup {
+    Referer(Sitemap.facebookClose.url)
+  }
+
+  addFields(() => userVar.email)
+
+  val roleList: List[String] = User.standardRoles.map(r => r.id.is)
+
+  val role = select[String]("I'm a", roleList(0), roleList)
+
+  def finish() {
+    val user = userVar.is
+    user.roles(List(role: String))
+    user.save
+    User.logUserIn(user, true, true)
     S.notice("Thanks for signing up!")
   }
 }

@@ -1,6 +1,8 @@
 package com.beamstream
 package model
 
+import config.AppConfig
+import lib.FacebookGraph
 import locs.Sitemap
 
 import scala.xml.Text
@@ -25,6 +27,9 @@ class User private () extends MongoAuthUser[User] with ObjectIdPk[User] {
   def userIdAsString: String = id.toString
 
   object username extends StringField(this, 32) {
+    override def optional_? =
+      if (AppConfig.isPreBeta) true
+      else false
     override def displayName = "Username"
     override def setFilter = trim _ :: super.setFilter
 
@@ -66,13 +71,28 @@ class User private () extends MongoAuthUser[User] with ObjectIdPk[User] {
   object verified extends BooleanField(this) {
     override def displayName = "Verified"
   }
-  object password extends PasswordField(this, 6, 32, Empty) {
+  object password extends PasswordField(this, 6, 32) {
     override def displayName = "Password"
+    def isSet: Boolean = value.length >= minLength
   }
   object permissions extends PermissionListField(this)
-  object roles extends ObjectIdRefListField(this, Role) {
+  object roles extends StringRefListField(this, Role) {
     def permissions: List[Permission] = objs.flatMap(_.permissions.is)
     def names: List[String] = objs.map(_.id.is)
+
+    /*
+     * Require users to have one of the standardRoles
+     */
+    private def valContainsStandardRole(msg: => String)(value: List[String]): List[FieldError] = {
+      if (value.filter(r => meta.standardRoles.exists(_.id.is == r)).isEmpty)
+        List(FieldError(this, Text(msg)))
+      else
+        Nil
+    }
+
+    override def validations =
+      valContainsStandardRole("Please select a role") _ ::
+      super.validations
   }
 
   lazy val authPermissions: Set[Permission] = (permissions.is ::: roles.permissions).toSet
@@ -89,13 +109,21 @@ class User private () extends MongoAuthUser[User] with ObjectIdPk[User] {
     override def defaultValue = "America/Chicago"
   }
 
-  object name extends StringField(this, 64) {
+  object firstName extends StringField(this, 64) {
     override def displayName = "Name"
 
     override def validations =
       valMaxLen(64, "Name must be 64 characters or less") _ ::
       super.validations
   }
+  object lastName extends StringField(this, 64) {
+    override def displayName = "Name"
+
+    override def validations =
+      valMaxLen(64, "Name must be 64 characters or less") _ ::
+      super.validations
+  }
+  def name = (firstName.is+" "+lastName.is).trim
   object location extends StringField(this, 64) {
     override def displayName = "Location"
 
@@ -117,8 +145,13 @@ class User private () extends MongoAuthUser[User] with ObjectIdPk[User] {
       valMaxLen(64, "Name must be 64 characters or less") _ ::
       super.validations
   }
+  object birthday extends StringField(this, 8) { // mm/dd/yyyy
+    override def displayName = "Birthday"
+  }
 
-  object facebookId extends IntField(this)
+  object facebookId extends IntField(this) {
+    override def optional_? = true
+  }
 
   /*
    * FieldContainers for various LiftScreeens.
@@ -128,14 +161,20 @@ class User private () extends MongoAuthUser[User] with ObjectIdPk[User] {
   }
 
   def profileScreenFields = new FieldContainer {
-    def allFields = List(name, location, bio)
+    def allFields = List(firstName, lastName, location, bio, gender, birthday)
   }
 
   def registerScreenFields = new FieldContainer {
     def allFields = List(username, email)
   }
 
+  def facebookRegisterScreenFields = new FieldContainer {
+    def allFields = List(username, email, firstName, lastName, location, gender, birthday)
+  }
+
   def whenCreated: DateTime = new DateTime(id.is.getTime)
+
+  def isConnectedToFacebook: Boolean = facebookId.is > 0
 }
 
 object User extends User with ProtoAuthUserMeta[User] with Loggable {
@@ -144,8 +183,8 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
   override def collectionName = "user.users"
 
   ensureIndex((email.name -> 1), true)
-  ensureIndex((username.name -> 1), true)
-  ensureIndex((facebookId.name -> 1))
+  ensureIndex((facebookId.name -> 1), ("sparse" -> true) ~ ("unique" -> true))
+  ensureIndex((username.name -> 1), ("sparse" -> true) ~ ("unique" -> true))
 
   def findByEmail(in: String): Box[User] = find(email.name, in)
   def findByUsername(in: String): Box[User] = find(username.name, in)
@@ -159,6 +198,8 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
     Helpers.tryo(
       in transform {
         case JField("id", JString(id)) => JField("facebookId", JInt(Helpers.toInt(id)))
+        case JField("first_name", JString(fname)) => JField("firstName", JString(fname))
+        case JField("last_name", JString(fname)) => JField("lastName", JString(fname))
         case JField("location", JObject(List(JField("facebookId", JInt(id)), JField("name", JString(name))))) =>
           JField("location", JString(name))
         case JField("timezone", JInt(offset)) =>
@@ -176,13 +217,30 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
     }
   }
 
+  def disconnectFacebook(in: User): Unit = {
+    // remove the facebookId
+    val qry = (id.name -> in.id.is)
+    val upd = ("$unset" -> (facebookId.name -> 1))
+    User.update(qry, upd)
+  }
+
+  def disconnectFacebook(): Box[Unit] = {
+    User.currentUser.flatMap { user =>
+      // call facebook api to deauthorize
+      FacebookGraph.deletePermission(user.facebookId.is)
+        .filter(_ == true).map { x =>
+          disconnectFacebook(user)
+          FacebookGraph.currentAccessToken.remove()
+        }
+    }
+  }
+
   override def onLogIn: List[User => Unit] = List(user => User.loginCredentials.remove())
   override def onLogOut: List[Box[User] => Unit] = List(
     x => logger.debug("User.onLogOut called."),
     boxedUser => boxedUser.foreach { u =>
-      LoginToken.deleteAllByUserId(u.id.is)
       ExtSession.deleteExtCookie()
-      ExtSession.deleteAllByUserId(u.id.is)
+      FacebookGraph.currentAccessToken.remove()
     }
   )
 
@@ -200,7 +258,7 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
   private def logUserInFromToken(uid: ObjectId): Box[Unit] = find(uid).map { user =>
     user.verified(true)
     user.save
-    logUserIn(user, false)
+    logUserIn(user)
     LoginToken.deleteAllByUserId(user.id.is)
   }
 
@@ -253,10 +311,8 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
    * ExtSession
    */
   private def logUserInFromExtSession(uid: ObjectId): Box[Unit] = find(uid).map { user =>
-    logUserIn(user, false)
+    logUserIn(user)
   }
-
-  def createExtSession(uid: ObjectId) = ExtSession.createExtSession(uid)
 
   /*
   * Test for active ExtSession.
@@ -276,9 +332,18 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
 
   // used during login process
   object loginCredentials extends SessionVar[LoginCredentials](LoginCredentials(""))
-  object regUser extends SessionVar[User](createRecord)
+  object regUser extends SessionVar[User](createRecord.email(loginCredentials.is.email))
 
-  def createUserFromCredentials = createRecord.email(loginCredentials.is.email)
+  // where to send the user after logging in/registering
+  object loginContinueUrl extends SessionVar[String](Sitemap.home.url)
+
+  lazy val standardRoles: List[Role] = List(
+    Role.findOrCreate("Student"),
+    Role.findOrCreate("Educator"),
+    Role.findOrCreate("Professional")
+  )
+
+  def isConnectedToFaceBook: Boolean = currentUser.map(_.isConnectedToFacebook).openOr(false)
 }
 
 case class LoginCredentials(val email: String, val isRememberMe: Boolean = false)

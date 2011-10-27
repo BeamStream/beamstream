@@ -1,7 +1,8 @@
 package com.beamstream
 package snippet
 
-import lib.App
+import config.AppConfig
+import model.User
 
 import scala.xml.NodeSeq
 
@@ -9,7 +10,7 @@ import net.liftweb._
 import http.S
 import util.Props
 
-object ShowInProductionOnly {
+object ProductionOnly {
   def render(in: NodeSeq): NodeSeq =
     if (Props.productionMode) in
     else NodeSeq.Empty
@@ -25,6 +26,6 @@ object ThrowException {
 
 object HomePage {
   def render =
-    if (App.isPreBeta) <lift:embed what="/index-prebeta" />
+    if (AppConfig.isPreBeta) <lift:embed what="/index-prebeta" />
     else <lift:embed what="/index-main" />
 }

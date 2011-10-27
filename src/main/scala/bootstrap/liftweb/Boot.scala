@@ -9,15 +9,13 @@ import json._
 import util._
 import util.Helpers._
 
-import com.beamstream.api.ApiConfig
-import com.beamstream.lib.{ErrorHandler, Gravatar, SmtpMailer}
-import com.beamstream.locs.Sitemap
-import com.beamstream.model.{MongoConfig, User}
+import com.beamstream._
+import config.{ApiConfig, MongoConfig}
+import lib.{ErrorHandler, Gravatar, SmtpMailer}
+import locs.Sitemap
+import model.User
 
 import com.eltimn.auth.mongo._
-
-import omniauth.Omniauth
-import omniauth.lib.FacebookProvider
 
 /**
  * A class that's instantiated early and run. It allows the application
@@ -38,15 +36,8 @@ class Boot extends Loggable {
     AuthRules.systemEmail.default.set("info@beamstream.com")
     AuthRules.systemUsername.default.set("BeamStream Staff")
 
-    // omniauth
-    /*
-    val fb = new FacebookProvider("291234827561426", "77335964d06a4d020ebdd78d32b31e96", Some("email")) {
-      override def callback(): NodeSeq = {
-        doFacebookCallback
-      }
-    }*/
-    //Omniauth.successCallback.default.set(() => { logger.debug("successCallback called")} )
-    //Omniauth.init
+    // For S.loggedIn_? and TestCond.loggedIn/Out
+    LiftRules.loggedInTest = Full(() => User.isLoggedIn)
 
     // checks for ExtSession cookie
     LiftRules.earlyInStateful.append(User.testForExtSession)
@@ -88,11 +79,5 @@ class Boot extends Loggable {
 
     // Force the request to be UTF-8
     LiftRules.early.append(_.setCharacterEncoding("UTF-8"))
-
-    /*
-    LiftRules.earlyInStateful.append(ignored => {
-      logger.debug("Omniauth: "+Omniauth.currentAuth.map(ai => { ai.data.map(d => pretty(render(d))).getOrElse("") } ))
-    })
-    */
   }
 }

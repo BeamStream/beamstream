@@ -1,7 +1,7 @@
 package com.beamstream
 package snippet
 
-import model.BetaUser
+import model.User
 
 import net.liftweb._
 import http._
@@ -13,17 +13,19 @@ import util.FieldError
 import util.Helpers._
 import scala.xml.NodeSeq
 
+import com.eltimn.auth.mongo.Role
+
 object BetaForm {
   def render = {
     var email = "E-mail"
-    var role = "empty"
+    var role: Box[Role] = Empty
 
-    val roleList = ("empty", "I'm a") :: BetaUser.roles.map(r => (r, r))
+    val roleList: List[(Box[Role], String)] = (Empty, "I'm a") :: User.standardRoles.map(r => (Full(r), r.id.is))
 
     def process(): JsCmd = {
-      val user = BetaUser.createRecord
+      val user = User.createRecord
         .email(email)
-        .userRole(role)
+        .roles(role.toList.map(_.id.is))
 
       user.validate match {
         case Nil =>
@@ -34,7 +36,7 @@ object BetaForm {
     }
 
     "name=email" #> (SHtml.text(email, email = _)) &
-    "name=role" #> SHtml.selectObj[String](roleList, Full(role), role = _, "class" -> "sel80", "id" -> "country") &
+    "name=role" #> SHtml.selectObj[Box[Role]](roleList, Full(role), role = _, "class" -> "sel80", "id" -> "country") &
     "name=hidden" #> SHtml.hidden(process)
   }
 

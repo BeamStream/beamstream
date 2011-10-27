@@ -1,7 +1,7 @@
 package com.beamstream
 package snippet
 
-import lib.SnippetHelpers
+import lib.AppHelpers
 
 import scala.xml.NodeSeq
 
@@ -11,7 +11,7 @@ import http.{LiftRules, S}
 import sitemap.SiteMap
 import util.Helpers._
 
-object GroupMenu extends SnippetHelpers {
+object GroupMenu extends AppHelpers {
   def render(in: NodeSeq): NodeSeq = {
     for {
       group <- S.attr("group") ?~ "Group not specified"

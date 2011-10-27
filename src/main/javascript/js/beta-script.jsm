@@ -3,3 +3,5 @@ libs/jquery.mousewheel.js
 libs/jScrollPane.js
 libs/cusel.js
 libs/plusone.js
+
+beamstream.js

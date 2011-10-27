@@ -1,5 +1,5 @@
 package com.beamstream
-package model
+package config
 
 import net.liftweb._
 import common._

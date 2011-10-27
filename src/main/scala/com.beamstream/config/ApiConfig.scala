@@ -1,5 +1,7 @@
 package com.beamstream
-package api
+package config
+
+import api._
 
 import net.liftweb._
 import http.LiftRules

@@ -28,7 +28,6 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info)
   lazy val lift_mongodb = "net.liftweb" %% "lift-mongodb-record" % liftVersion
 
   // Liftmodules
-  val lift_omniauth = "net.liftmodules" %% "omniauth" % "2.4-SNAPSHOT-0.6"
 
   // misc
   lazy val lift_auth_mongo = "com.eltimn" %% "lift-auth-mongo" % "0.1-SNAPSHOT"
@@ -36,11 +35,10 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info)
   //lazy val commons_collections = "commons-collections" % "commons-collections" % "3.2.1"
   //lazy val commons_logging = "commons-logging" % "commons-logging" % "1.1.1"
   lazy val servlet = "javax.servlet" % "servlet-api" % "2.5" % "provided"
-  lazy val scribe = "org.scribe" % "scribe" % "1.2.3"
 
   lazy val dispatch = "net.databinder" %% "dispatch-core" % "0.8.5"
   lazy val dispatch_http = "net.databinder" %% "dispatch-http" % "0.8.5"
-  lazy val dispatch_json = "net.databinder" %% "dispatch-lift-json" % "0.8.5" intransitive()
+  //lazy val dispatch_json = "net.databinder" %% "dispatch-lift-json" % "0.8.5" intransitive()
 
   // test-scope
   lazy val specs = "org.scala-tools.testing" %% "specs" % specsVersion % "test"
@@ -50,7 +48,7 @@ class LiftProject(info: ProjectInfo) extends DefaultWebProject(info)
   override def closureSourcePath: Path = "src" / "main" / "javascript"
 
   // less.css plugin
-  override def lessSourceFilter: NameFilter = filter("styles.less") // only compile the main file
+  override def lessSourceFilter: NameFilter = filter("*styles.less") // only compile the main file
   override def lessSourcePath: Path = "src" / "main" / "less"
 
   // CloudBees

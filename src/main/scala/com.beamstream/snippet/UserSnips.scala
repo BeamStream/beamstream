@@ -1,7 +1,8 @@
 package com.beamstream
 package snippet
 
-import lib.{App, Gravatar, SnippetHelpers}
+import config.AppConfig
+import lib.{AppHelpers, FacebookGraph, Gravatar}
 import locs.Sitemap
 import model.{User, LoginCredentials}
 
@@ -10,10 +11,20 @@ import scala.xml._
 import net.liftweb._
 import common._
 import http.{DispatchSnippet, S, SHtml, StatefulSnippet}
+import http.js.JsCmd
+import http.js.JE._
 import util._
 import Helpers._
 
-sealed trait UserSnippet extends DispatchSnippet with SnippetHelpers with Loggable {
+object Register {
+  def render =
+    if (User.regUser.facebookId.is > 0)
+      <div lift="facebook_register_screen"></div>
+    else
+      <div lift="register_screen"></div>
+}
+
+sealed trait UserSnippet extends DispatchSnippet with AppHelpers with Loggable {
 
   def dispatch = {
     case "header" => header
@@ -52,8 +63,8 @@ sealed trait UserSnippet extends DispatchSnippet with SnippetHelpers with Loggab
   }
 
   def name(xhtml: NodeSeq): NodeSeq = serve { user =>
-    if (user.name.is.length > 0)
-      Text("%s (%s)".format(user.name.is, user.username.is))
+    if (user.name.length > 0)
+      Text("%s (%s)".format(user.name, user.username.is))
     else
       Text(user.username.is)
   }
@@ -89,7 +100,7 @@ object ProfileLocUser extends UserSnippet {
 
     val cssSel =
       "#id_avatar *" #> Gravatar.imgTag(user.email.is) &
-      "#id_name *" #> <h3>{user.name.is}</h3> &
+      "#id_name *" #> <h3>{user.name}</h3> &
       "#id_location *" #> user.location.is &
       "#id_whencreated" #> df.format(user.whenCreated.toDate).toString &
       "#id_bio *" #> user.bio.is &
@@ -130,9 +141,8 @@ class UserLogin extends StatefulSnippet with Loggable {
     if (hasPassword && email.length > 0 && password.length > 0) {
       User.findByEmail(email) match {
         case Full(user) if (user.password.isMatch(password)) =>
-          User.logUserIn(user, true)
-          if (remember) User.createExtSession(user.id.is)
-          S.seeOther(Sitemap.home.url)
+          User.logUserIn(user, true, remember)
+          S.seeOther(User.loginContinueUrl.is)
         case _ => S.error("Invalid credentials.")
       }
     }
@@ -161,6 +171,39 @@ class UserLogin extends StatefulSnippet with Loggable {
   private def cancel() = S.seeOther(Sitemap.home.url)
 }
 
+object UserNetworks extends AppHelpers with Loggable {
+  def render = {
+    User.currentUser match {
+      case Full(user) if (user.isConnectedToFacebook) =>
+        val disconnectHtml =
+          //SHtml.ajaxButton("Disconnect", () => disconnect, ("class" -> "btn"))
+          SHtml.link(Sitemap.networks.url, () => disconnect, Text("Disconnect"), ("class" -> "btn"), ("onclick" -> """return confirm("Disconnect Facebook?");"""))
+
+        "#id_facebook" #>
+          <span>
+          Linked to: <a href={"http://www.facebook.com/profile.php?id="+user.facebookId.toString}>{user.name}</a><br />
+          </span> &
+        "#id_facebookdisconnect" #> disconnectHtml
+
+      case _ =>
+        User.loginContinueUrl(Sitemap.networks.url)
+        "#id_facebook" #> Facebook.link &
+        "#id_facebookdisconnect" #> ""
+    }
+  }
+
+  private def disconnect: Unit =
+    User.disconnectFacebook match {
+      case Full(x) =>
+        User.currentUser.foreach { user =>
+          S.notice("You are no longer connected to Facebook")
+          S.redirectTo(Sitemap.networks.url)
+        }
+      case Failure(msg, _, _) => S.error(msg); //JsRaw("window.location.reload").cmd
+      case Empty => S.warning("Empty"); //JsRaw("window.location.reload").cmd
+    }
+}
+
 object UserTopbar {
   def render = {
     User.currentUser match {
@@ -172,16 +215,15 @@ object UserTopbar {
               <span>{user.username.is}</span>
             </a>
             <ul class="dropdown-menu">
-              <!--<li><lift:Menu.item name="User" donthide="true" linktoself="true">Profile</lift:Menu.item></li>-->
               <li><a href={"/user/%s".format(user.username.is)}>Profile</a></li>
               <li><lift:Menu.item name="Account" donthide="true" linktoself="true">Settings</lift:Menu.item></li>
               <li><lift:Menu.item name="About" donthide="true" linktoself="true">Help</lift:Menu.item></li>
               <li class="divider"></li>
-              <li><a href="/logout">Log Out</a></li>
+              <li><lift:Menu.item name="Logout" donthide="true" linktoself="true">Log Out</lift:Menu.item></li>
             </ul>
           </li>
         </ul>
-      case _ if (App.isPreBeta) => NodeSeq.Empty
+      case _ if (AppConfig.isPreBeta) => NodeSeq.Empty
       case _ if (S.request.flatMap(_.location).map(_.name).filterNot(it => List("Login", "Register").contains(it)).isDefined) =>
         <form action="/login" style="float: right">
           <button class="btn">Sign In</button>
@@ -193,8 +235,12 @@ object UserTopbar {
 
 object UserDebug {
   def render =
-    <div>
-      User.currentUserId: {User.currentUserId.toString}<br />
-      User.currentUser: {User.currentUser.toString}<br />
-    </div>
+    if (Props.productionMode)
+      NodeSeq.Empty
+    else
+      <span style="display: none;">
+        User.currentUserId: {User.currentUserId.toString}<br />
+        User.currentUser: {User.currentUser.toString}<br />
+        AccessToken: {FacebookGraph.currentAccessToken.toString}<br />
+      </span>
 }
