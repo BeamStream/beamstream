@@ -110,14 +110,14 @@ class User private () extends MongoAuthUser[User] with ObjectIdPk[User] {
   }
 
   object firstName extends StringField(this, 64) {
-    override def displayName = "Name"
+    override def displayName = "First Name"
 
     override def validations =
       valMaxLen(64, "Name must be 64 characters or less") _ ::
       super.validations
   }
   object lastName extends StringField(this, 64) {
-    override def displayName = "Name"
+    override def displayName = "Last Name"
 
     override def validations =
       valMaxLen(64, "Name must be 64 characters or less") _ ::
@@ -255,13 +255,6 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
   /*
    * LoginToken
    */
-  private def logUserInFromToken(uid: ObjectId): Box[Unit] = find(uid).map { user =>
-    user.verified(true)
-    user.save
-    logUserIn(user)
-    LoginToken.deleteAllByUserId(user.id.is)
-  }
-
   override def handleLoginToken: Box[LiftResponse] = {
     var respUrl = indexUrl.toString
     S.param("token").flatMap(LoginToken.findByStringId) match {
@@ -269,10 +262,19 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
         S.error("Login token has expired")
         at.delete_!
       }
-      case Full(at) => logUserInFromToken(at.userId.is) match {
-        case Full(_) => respUrl = loginTokenAfterUrl.toString
-        case _ => S.error("User not found")
-      }
+      case Full(at) => find(at.userId.is).map(user => {
+        if (user.validate.length == 0) {
+          user.verified(true)
+          user.save
+          logUserIn(user)
+          LoginToken.deleteAllByUserId(user.id.is)
+          respUrl = loginTokenAfterUrl.toString
+        }
+        else {
+          User.regUser(user)
+          respUrl = Sitemap.register.url
+        }
+      }).openOr(S.error("User not found"))
       case _ => S.warning("Login token not provided")
     }
 
