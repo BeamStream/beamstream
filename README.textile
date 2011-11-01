@@ -39,3 +39,9 @@ To Push to CloudFoundry, you must specify a path so it can find the war:
 
 There is a @cfdeploy@ task defined in sbt that will do this for you. It will only work
 after an intial @vmc push@.
+
+h2. After Pre Beta mode
+
+* Delete all documents in user.extsessions
+* Send LoginToken to all users that had signed up via email only
+* Send link to home page for users that signed up via facebook. They will need to click the connect with facebook button.
