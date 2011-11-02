@@ -13,7 +13,7 @@ import util.FieldError
 import util.Helpers._
 import scala.xml.NodeSeq
 
-import com.eltimn.auth.mongo.Role
+import net.liftmodules.mongoauth.model.Role
 
 object BetaForm {
   def render = {

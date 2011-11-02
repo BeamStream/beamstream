@@ -19,7 +19,9 @@ import mongodb.record.field._
 import record.field.{PasswordField => _, _}
 import util.{FieldContainer, FieldError, Helpers}
 
-import com.eltimn.auth.mongo._
+import net.liftmodules.mongoauth._
+import net.liftmodules.mongoauth.field._
+import net.liftmodules.mongoauth.model._
 
 class User private () extends MongoAuthUser[User] with ObjectIdPk[User] {
   def meta = User
@@ -245,12 +247,12 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
   )
 
   /*
-   * AuthRules vars
+   * MongoAuth vars
    */
-  private lazy val siteName = AuthRules.siteName.vend
-  private lazy val sysUsername = AuthRules.systemUsername.vend
-  private lazy val indexUrl = AuthRules.indexUrl.vend
-  private lazy val loginTokenAfterUrl = AuthRules.loginTokenAfterUrl.vend
+  private lazy val siteName = MongoAuth.siteName.vend
+  private lazy val sysUsername = MongoAuth.systemUsername.vend
+  private lazy val indexUrl = MongoAuth.indexUrl.vend
+  private lazy val loginTokenAfterUrl = MongoAuth.loginTokenAfterUrl.vend
 
   /*
    * LoginToken
@@ -302,7 +304,7 @@ object User extends User with ProtoAuthUserMeta[User] with Loggable {
       """.format(siteName, token.url, sysUsername).stripMargin
 
     sendMail(
-      From(AuthRules.systemFancyEmail),
+      From(MongoAuth.systemFancyEmail),
       Subject("%s Password Help".format(siteName)),
       To(user.fancyEmail),
       PlainMailBodyType(msgTxt)

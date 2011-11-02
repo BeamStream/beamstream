@@ -13,7 +13,7 @@ import http.{LiftScreen, S}
 import util.FieldError
 import util.Helpers._
 
-import com.eltimn.auth.mongo.Role
+import net.liftmodules.mongoauth.model.Role
 
 /*
  * Use for editing the currently logged in user only.

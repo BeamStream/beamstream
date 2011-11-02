@@ -15,7 +15,7 @@ import lib.{ErrorHandler, Gravatar, SmtpMailer}
 import locs.Sitemap
 import model.User
 
-import com.eltimn.auth.mongo._
+import net.liftmodules.mongoauth.MongoAuth
 
 /**
  * A class that's instantiated early and run. It allows the application
@@ -29,12 +29,12 @@ class Boot extends Loggable {
     MongoConfig.init()
 
     // init auth-mongo
-    AuthRules.authUserMeta.default.set(User)
-    AuthRules.indexUrl.default.set(Sitemap.home.path)
-    AuthRules.loginTokenAfterUrl.default.set(Sitemap.password.path)
-    AuthRules.siteName.default.set("BeamStream")
-    AuthRules.systemEmail.default.set("info@beamstream.com")
-    AuthRules.systemUsername.default.set("BeamStream Staff")
+    MongoAuth.authUserMeta.default.set(User)
+    MongoAuth.indexUrl.default.set(Sitemap.home.url)
+    MongoAuth.loginTokenAfterUrl.default.set(Sitemap.password.url)
+    MongoAuth.siteName.default.set("BeamStream")
+    MongoAuth.systemEmail.default.set("info@beamstream.com")
+    MongoAuth.systemUsername.default.set("BeamStream Staff")
 
     // For S.loggedIn_? and TestCond.loggedIn/Out
     LiftRules.loggedInTest = Full(() => User.isLoggedIn)

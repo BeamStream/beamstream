@@ -12,7 +12,7 @@ import sitemap._
 import sitemap.Loc._
 import util.Helpers
 
-import com.eltimn.auth.mongo.{Locs, Path}
+import net.liftmodules.mongoauth.Locs
 
 object MenuGroups {
   val SettingsGroup = LocGroup("settings")
@@ -23,8 +23,7 @@ object MenuGroups {
  * Wrapper for Menu locations
  */
 case class MenuLoc(menu: Menu) {
-  lazy val path: Path = Path(menu.loc.link.uriList)
-  lazy val url: String = path.toString
+  lazy val url: String = menu.loc.link.uriList.mkString("/","/","")
   lazy val fullUrl: String = S.hostAndPath+url
 }
 
