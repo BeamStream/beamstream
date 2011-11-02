@@ -1,7 +1,3 @@
-import com.typesafe.startscript.StartScriptPlugin
-
-seq(StartScriptPlugin.startScriptForClassesSettings: _*)
-
 name := "beamstream"
 
 organization := "BeamStream"
@@ -24,7 +20,7 @@ resolvers += "Liftmodules repo" at "https://repository-liftmodules.forge.cloudbe
     "net.databinder" %% "dispatch-core" % "0.8.5",
     "net.databinder" %% "dispatch-http" % "0.8.5",
     "org.scala-tools.testing" %% "specs" % "1.6.9" % "test",
-    "org.mortbay.jetty" % "jetty" % "6.1.22" % "container"
+    "org.eclipse.jetty" % "jetty-webapp" % "7.5.4.v20111024" % "container"
   )
 }
 
@@ -36,9 +32,11 @@ seq(lessSettings:_*)
 
 (sourceDirectory in (Compile, LessKeys.less)) <<= (sourceDirectory in Compile)(_ / "less")
 
-seq(closureSettings:_*)
+seq(jsSettings:_*)
 
-(sourceDirectory in (Compile, ClosureKeys.closure)) <<= (sourceDirectory in Compile)(_ / "javascript")
+(JsKeys.filter in (Compile, JsKeys.js)) := "*.jsm"
+
+(sourceDirectory in (Compile, JsKeys.js)) <<= (sourceDirectory in Compile)(_ / "javascript")
 
 seq(webSettings :_*)
 
@@ -46,6 +44,8 @@ seq(webSettings :_*)
 (webappResources in Compile) <+= (resourceManaged in Compile)
 
 // make compile depend on less and closure
-(compile in Compile) <<= compile in Compile dependsOn (ClosureKeys.closure in Compile, LessKeys.less in Compile)
+(compile in Compile) <<= compile in Compile dependsOn (JsKeys.js in Compile, LessKeys.less in Compile)
 
 //seq(bees.RunCloudPlugin.deploymentSettings :_*)
+
+checksums := Nil 
