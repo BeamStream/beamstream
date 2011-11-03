@@ -49,3 +49,9 @@ seq(webSettings :_*)
 //seq(bees.RunCloudPlugin.deploymentSettings :_*)
 
 checksums := Nil 
+
+// To publish to the Cloudbees repos:
+
+publishTo := Some("beamstream repository" at "https://repository-beamstream.forge.cloudbees.com/release/")
+ 
+credentials += Credentials( file("/private/beamstream/cloudbees.credentials") ) 

@@ -10,3 +10,8 @@ project/
 
 # sublime-text
 *.sublime-*
+
+# eclipse
+.cache
+.classpath
+.project
