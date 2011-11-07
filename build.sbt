@@ -15,7 +15,8 @@ resolvers += "Liftmodules repo" at "https://repository-liftmodules.forge.cloudbe
   libraryDependencies ++= Seq(
     "net.liftweb" %% "lift-mongodb-record" % liftVersion,
     "net.liftmodules" %% "mongoauth" % (liftVersion+"-0.1"),
-    "ch.qos.logback" % "logback-classic" % "0.9.26",
+    "net.liftmodules" %% "google-analytics" % (liftVersion+"-0.9"),
+    "ch.qos.logback" % "logback-classic" % "1.0.0",
     "javax.servlet" % "servlet-api" % "2.5" % "provided",
     "net.databinder" %% "dispatch-core" % "0.8.5",
     "net.databinder" %% "dispatch-http" % "0.8.5",
@@ -48,10 +49,10 @@ seq(webSettings :_*)
 
 //seq(bees.RunCloudPlugin.deploymentSettings :_*)
 
-checksums := Nil 
+checksums := Nil // lift 2.4-snapshot's checksums are bad
 
 // To publish to the Cloudbees repos:
 
-publishTo := Some("beamstream repository" at "https://repository-beamstream.forge.cloudbees.com/release/")
+//publishTo := Some("beamstream repository" at "https://repository-beamstream.forge.cloudbees.com/release/")
  
-credentials += Credentials( file("/private/beamstream/cloudbees.credentials") ) 
+//credentials += Credentials( file("/private/beamstream/cloudbees.credentials") ) 

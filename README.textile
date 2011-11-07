@@ -3,10 +3,9 @@ h2. Twitter Bootstrap
 Bootstrap is included via a git submodule. When first checking out this project
 you must run:
 
-@git init@
-@git submodule add https://github.com/twitter/bootstrap.git src/main/javascript/js/bootstrap@
-@git submodule init@
-@git add src/main/javascript/js/bootstrap@
+@git submodule add https://github.com/twitter/bootstrap.git src/main/javascript/js/bootstrap
+git submodule init
+git add src/main/javascript/js/bootstrap@
 
 This will pull in the necessary files.
 
@@ -24,10 +23,10 @@ h2. Building
 
 This app uses sbt 0.7.7 (due to sbt-closure only working with that version). To build for the first time, run:
 
-@bash\$ sbt@
-@> update@
-@> prepare-webapp@
-@> jetty-run@
+@bash\$ sbt
+> update
+> compile
+> container:start@
 
 It will be running on http://localhost:8080
 

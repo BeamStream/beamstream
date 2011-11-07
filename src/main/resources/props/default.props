@@ -9,3 +9,4 @@ mail.smtp.pass=_zTWk72-H1ycfT4pHC8L4Icl
 #mongo.default.name=beamstream_dev
 facebook.key=291234827561426
 facebook.secret=77335964d06a4d020ebdd78d32b31e96
+google.analytics.id=UA-XXXXXXXX-X

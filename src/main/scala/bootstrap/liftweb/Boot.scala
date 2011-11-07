@@ -79,5 +79,17 @@ class Boot extends Loggable {
 
     // Force the request to be UTF-8
     LiftRules.early.append(_.setCharacterEncoding("UTF-8"))
+
+    // Do root domain redirect
+    LiftRules.earlyResponse.append(req => {
+      logger.debug("serverName: "+req.request.serverName)
+      if (req.request.serverName == "beamstream.com")
+        Full(PermRedirectResponse("http://www.beamstream.com", req))
+      else
+        Empty
+    })
+
+    // Google Analytics
+    bootstrap.liftmodules.GoogleAnalytics.init
   }
 }
