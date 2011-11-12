@@ -3,7 +3,7 @@ package locs
 
 import config.AppConfig
 import lib.FacebookGraph
-import model.User
+import model.{Stream, User}
 
 import net.liftweb._
 import common._
@@ -23,7 +23,7 @@ object MenuGroups {
  * Wrapper for Menu locations
  */
 case class MenuLoc(menu: Menu) {
-  lazy val url: String = menu.loc.link.uriList.mkString("/","/","")
+  lazy val url: String = menu.loc.link.uriList.mkString("/","/","") //menu.calcHref(Unit)
   lazy val fullUrl: String = S.hostAndPath+url
 }
 
@@ -75,6 +75,16 @@ object Sitemap extends Locs {
   val facebookError = MenuLoc(Menu("FacebookError", "Error") / "facebook" / "error" >> Hidden)
   val facebookRegister = MenuLoc(Menu("FacebookRegister", "Register") / "facebook" / "register" >> Hidden)
 
+  // streams
+  val createStream = MenuLoc(Menu("CreateStream", "Create Stream") / "stream" / "create" >> RequireLoggedIn)
+  val joinStream = MenuLoc(Menu("JoinStream", "Join Stream") / "stream" / "join" >> RequireLoggedIn)
+  private val streamParamMenu = Menu.param[Stream]("Stream", "Stream",
+    Stream.findByStringId _,
+    _.id.toString
+  ) / "stream"
+  val stream = MenuLoc(streamParamMenu)
+  lazy val streamLoc = streamParamMenu.toLoc
+
   private def commonMenus = List(
     home.menu,
     Menu.i("Throw") / "throw" >> Hidden,
@@ -98,7 +108,10 @@ object Sitemap extends Locs {
     editProfile.menu,
     networks.menu,
     Menu.i("About") / "about" >> TopBarGroup,
-    Menu.i("Contact") / "contact" >> TopBarGroup
+    Menu.i("Contact") / "contact" >> TopBarGroup,
+    createStream.menu,
+    joinStream.menu,
+    stream.menu
   )
 
   /*

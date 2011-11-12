@@ -10,5 +10,8 @@ object ApiConfig {
   def init(): Unit = {
     // stateful -- associated with a servlet container session
     LiftRules.dispatch.append(FacebookApiStateful)
+    LiftRules.dispatch.append(StreamApiStateful)
+
+    // stateless
   }
 }

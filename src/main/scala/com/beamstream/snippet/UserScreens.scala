@@ -44,9 +44,10 @@ sealed trait BasePasswordScreen {
 
   val passwordField = password(pwdName, "", trim,
     valMinLen(pwdMinLength, "Password must be at least "+pwdMinLength+" characters"),
-    valMaxLen(pwdMaxLength, "Password must be "+pwdMaxLength+" characters or less")
+    valMaxLen(pwdMaxLength, "Password must be "+pwdMaxLength+" characters or less"),
+    ("tabindex" -> "1")
   )
-  val confirmPasswordField = password("Confirm Password", "", trim)
+  val confirmPasswordField = password("Confirm Password", "", trim, ("tabindex" -> "1"))
 
   def passwordsMustMatch(): Errors = {
     if (passwordField.is != confirmPasswordField.is)
@@ -105,7 +106,7 @@ trait BaseRegisterScreen extends BaseScreen {
 object RegisterScreen extends BaseRegisterScreen with BasePasswordScreen {
   override def validations = passwordsMustMatch _ :: super.validations
 
-  val rememberMe = builder("", User.loginCredentials.is.isRememberMe)
+  val rememberMe = builder("", User.loginCredentials.is.isRememberMe, ("tabindex" -> "1"))
     .help(Text("Remember me when I come back later."))
     .make
 

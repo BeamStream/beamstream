@@ -125,7 +125,14 @@ class User private () extends MongoAuthUser[User] with ObjectIdPk[User] {
       valMaxLen(64, "Name must be 64 characters or less") _ ::
       super.validations
   }
-  def name = (firstName.is+" "+lastName.is).trim
+
+  lazy val name = (firstName.is+" "+lastName.is).trim
+  lazy val nameAndUsername =
+    if (name.length > 0)
+      "%s (%s)".format(name, username.is)
+    else
+      username.is
+
   object location extends StringField(this, 64) {
     override def displayName = "Location"
 
@@ -150,7 +157,6 @@ class User private () extends MongoAuthUser[User] with ObjectIdPk[User] {
   object birthday extends StringField(this, 8) { // mm/dd/yyyy
     override def displayName = "Birthday"
   }
-
   object facebookId extends IntField(this) {
     override def optional_? = true
   }
@@ -177,6 +183,9 @@ class User private () extends MongoAuthUser[User] with ObjectIdPk[User] {
   def whenCreated: DateTime = new DateTime(id.is.getTime)
 
   def isConnectedToFacebook: Boolean = facebookId.is > 0
+
+  lazy val userStreams = UserStream.findAllByUserId(this.id.is)
+  lazy val streams = Stream.findAllByList(userStreams.map(_.streamId.is))
 }
 
 object User extends User with ProtoAuthUserMeta[User] with Loggable {

@@ -1,0 +1,26 @@
+<span>
+<head>
+  <script>
+    var AlertModel = {
+      errors: ko.observableArray([]),
+      addError: function(err) {
+        this.errors.push(err);
+      },
+      removeError: function(err) {
+        this.errors.remove(err);
+      }
+    }
+
+    $(document).ready(function() {
+      ko.applyBindings(AlertModel);
+    });
+  </script>
+</head>
+<div data-bind="template: { name: 'errorTemplate', foreach: errors }"></div>
+<script id="errorTemplate" type="text/html">
+<div id="lift__noticesContainer___${level}" class="alert-message ${level}">
+  <a href="#" class="close" data-bind="click: function() { AlertModel.removeError($data) }">&times;</a>
+  <p>${message}</p>
+</div>
+</script>
+</span>

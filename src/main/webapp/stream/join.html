@@ -1,0 +1,33 @@
+<div lift="surround?with=default;at=content">
+  <script>
+  $(document).ready(function() {
+    $("#streams").autocomplete({
+      source: "/api/stream/names",
+      minLength: 2,
+      select: function(event, ui) {
+        $("input[name=stream_id]").val(ui.item.id);
+        $("input[type=submit]").removeAttr("disabled");
+      }
+    });
+  });
+  </script>
+  <div id="bootstrap-alerts" lift="BootstrapAlerts"></div>
+  <div class="row">
+    <div class="span12">
+      <form method="post" lift="JoinStream">
+        <input type="hidden" name="stream_id" />
+        <fieldset>
+          <div class="ui-widget">
+            <label for="streams" style="padding-right:8px;">Streams</label>
+            <input id="streams"/>
+            <input type="submit" value="Join" class="btn primary" disabled="disabled" />
+          </div>
+        </fieldset>
+      </form>
+    </div>
+    <div class="span4">
+      <lift:Menu.item name="CreateStream">Create A New Stream</lift:Menu.item>
+    </div>
+  </div>
+</div>
+

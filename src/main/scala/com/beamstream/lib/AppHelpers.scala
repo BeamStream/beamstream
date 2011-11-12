@@ -6,6 +6,8 @@ import scala.xml._
 import net.liftweb._
 import common._
 import http.NoticeType
+import http.js._
+import http.js.JE._
 import json._
 import util.CssSel
 import util.Helpers._
@@ -55,20 +57,25 @@ trait AppHelpers {
   /*
    * For RestHelper API classes
    */
-  implicit def boxJsonToJsonResponse(in: Box[JValue]): JValue = in match {
-    case Full(jv) => jv
-    case Failure(msg, _, _) => JsonAlert.error(msg).asJValue
-    case Empty => JsonAlert.warning("Empty response").asJValue
+  implicit def boxJsonToJsonResponse(in: Box[JValue]): JValue = {
+    import JsonDSL._
+    in match {
+      case Full(jv) => jv
+      case Failure(msg, _, _) => ("alert" -> JsonAlert.error(msg).asJValue)
+      case Empty => ("alert" -> JsonAlert.warning("Empty response").asJValue)
+    }
   }
 
-  case class JsonAlert(val message: String, val level: NoticeType.Value) {
+  /*
+   * For Ajax classes
+   */
+  implicit def boxJsCmdToJsCmd(in: Box[JsCmd]): JsCmd = {
     import JsonDSL._
-    def asJValue: JValue = ("alert" -> ("message" -> message) ~ ("level" -> level.title))
-  }
-  object JsonAlert {
-    def info(msg: String): JsonAlert = JsonAlert(msg, NoticeType.Notice)
-    def error(msg: String): JsonAlert = JsonAlert(msg, NoticeType.Error)
-    def warning(msg: String): JsonAlert = JsonAlert(msg, NoticeType.Warning)
+    in match {
+      case Full(jc) => jc
+      case Failure(msg, _, _) => JsFunc("AlertModel.addError", JsonAlert.error(msg).asJsExp).cmd
+      case Empty => JsFunc("AlertModel.addError", JsonAlert.warning("Empty response").asJsExp).cmd
+    }
   }
 
   object AsObjectId {
@@ -76,5 +83,10 @@ trait AppHelpers {
      private def asObjectId(in: String): Option[ObjectId] =
       if (ObjectId.isValid(in)) Some(new ObjectId(in))
       else None
+  }
+
+  def lowerCaseTitle(noticeType: NoticeType.Value): String = noticeType match {
+    case NoticeType.Notice => "info"
+    case _ => noticeType.lowerCaseTitle
   }
 }

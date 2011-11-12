@@ -1,0 +1,63 @@
+<div lift="surround?with=default;at=content">
+  <span lift="embed?what=/templates-hidden/parts/jsalerts"></span>
+  <div class="row">
+    <div class="span12">
+      <form lift="form.ajax">
+        <div lift="PostMessage">
+          <ul class="tabs">
+            <li class="active"><span id="id_tab"></span></li>
+            <li><a href="#">Tasks</a></li>
+            <li><a href="#">Questions</a></li>
+            <li><a href="#">Surveys</a></li>
+          </ul>
+          <div>
+            <fieldset>
+              <input name="message" />
+            </fieldset>
+            <input type="submit" class="btn primary" value="Submit" />
+          </div>
+        </div>
+      </form>
+      <table>
+        <tbody id="id_messages"></tbody>
+      </table>
+    </div>
+    <div class="span4">
+      <span lift="embed?what=/templates-hidden/parts/sidebar"></span>
+      <h5>Active Users</h5>
+      <ul id="id_active_users"></ul>
+    </div>
+  </div>
+
+  <script id="messageTemplate" type="text/x-jquery-tmpl">
+    <tr>
+      <td width="48"><img src="${avatarUrl}" /></td>
+      <td>
+        <strong>${userName}</strong>
+        <p>${text}</p>
+        <abbr class="timeago" title="${date}">${date}</abbr>
+      </td>
+    </tr>
+  </script>
+
+  <script id="userTemplate" type="text/x-jquery-tmpl">
+    <li>${name}</li>
+  </script>
+
+  <script>
+  var StreamModel = {
+    clearForm: function() {
+      $("#id_message").val("");
+    },
+    renderMsgs: function(msgs) {
+      $("#messageTemplate").tmpl(msgs).prependTo("#id_messages");
+      $("abbr.timeago").timeago();
+    },
+    renderUsers: function(users) {
+      $("#id_active_users").html("");
+      $("#userTemplate").tmpl(users).appendTo("#id_active_users");
+    }
+  };
+  </script>
+  <span lift="Messages.updater"></span>
+</div>

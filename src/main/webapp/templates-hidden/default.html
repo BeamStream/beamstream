@@ -2,13 +2,14 @@
   <lift:head>
     <title lift="Menu.title">BeamStream: %*%</title>
   </lift:head>
-  <div class="container">
-    <div class="content">
-      <div class="page-header">
-        <h1><span lift="Menu.title"></span></h1>
-      </div>
-      <lift:bind name="content"></lift:bind>
+  <div class="content">
+    <div class="page-header">
+      <h1><span lift="Menu.title"></span>
+      <div style="display:none; float:right;" id="ajax-spinner">
+        <img src="/img/spinner.gif" width="16" height="16"/>
+      </div></h1>
     </div>
-    <lift:embed what="/templates-hidden/parts/footer"></lift:embed>
-  </div> <!-- /container -->
+    <lift:bind name="content"></lift:bind>
+  </div>
+  <lift:embed what="/templates-hidden/parts/footer"></lift:embed>
 </div>

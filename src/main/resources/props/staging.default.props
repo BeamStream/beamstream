@@ -1,4 +1,4 @@
-app.mode=prebeta
+app.mode=main
 mail.smtp.host=smtp.gmail.com
 mail.smtp.user=beamstreamdev@gmail.com
 mail.smtp.pass=_zTWk72-H1ycfT4pHC8L4Icl

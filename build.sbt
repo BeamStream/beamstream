@@ -6,14 +6,13 @@ version := "0.1-SNAPSHOT"
 
 scalaVersion := "2.9.1"
 
-resolvers += ScalaToolsSnapshots
-
 resolvers += "Liftmodules repo" at "https://repository-liftmodules.forge.cloudbees.com/release"
 
 {
-  val liftVersion = "2.4-SNAPSHOT"
+  val liftVersion = "2.4-M5"
   libraryDependencies ++= Seq(
     "net.liftweb" %% "lift-mongodb-record" % liftVersion,
+    "net.liftweb" %% "lift-textile" % liftVersion,
     "net.liftmodules" %% "mongoauth" % (liftVersion+"-0.1"),
     "net.liftmodules" %% "google-analytics" % (liftVersion+"-0.9"),
     "ch.qos.logback" % "logback-classic" % "1.0.0",
@@ -31,13 +30,13 @@ seq(lessSettings:_*)
 
 (LessKeys.filter in (Compile, LessKeys.less)) := "*styles.less"
 
-(sourceDirectory in (Compile, LessKeys.less)) <<= (sourceDirectory in Compile)(_ / "less")
-
 seq(jsSettings:_*)
 
 (JsKeys.filter in (Compile, JsKeys.js)) := "*.jsm"
 
 (sourceDirectory in (Compile, JsKeys.js)) <<= (sourceDirectory in Compile)(_ / "javascript")
+
+(resourceManaged in (Compile, JsKeys.js)) <<= (resourceManaged in Compile)(_ / "js")
 
 seq(webSettings :_*)
 
@@ -45,14 +44,12 @@ seq(webSettings :_*)
 (webappResources in Compile) <+= (resourceManaged in Compile)
 
 // make compile depend on less and closure
-(compile in Compile) <<= compile in Compile dependsOn (JsKeys.js in Compile, LessKeys.less in Compile)
+(Keys.compile in Compile) <<= Keys.compile in Compile dependsOn (JsKeys.js in Compile, LessKeys.less in Compile)
 
 //seq(bees.RunCloudPlugin.deploymentSettings :_*)
-
-checksums := Nil // lift 2.4-snapshot's checksums are bad
 
 // To publish to the Cloudbees repos:
 
 //publishTo := Some("beamstream repository" at "https://repository-beamstream.forge.cloudbees.com/release/")
- 
-//credentials += Credentials( file("/private/beamstream/cloudbees.credentials") ) 
+
+//credentials += Credentials( file("/private/beamstream/cloudbees.credentials") )

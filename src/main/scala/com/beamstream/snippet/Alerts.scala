@@ -1,6 +1,8 @@
 package com.beamstream
 package snippet
 
+import lib.AppHelpers
+
 import scala.xml.{NodeSeq, Text}
 
 import net.liftweb._
@@ -9,7 +11,7 @@ import http.{Factory, NoticeType, S, SHtml}
 import util.Helpers._
 
 
-object BootstrapAlerts extends Factory with Loggable {
+object BootstrapAlerts extends Factory with AppHelpers with Loggable {
   /*
    * Config
    */
@@ -46,14 +48,13 @@ object BootstrapAlerts extends Factory with Loggable {
     }
 
     // Render all three types together
-    List((S.errors, NoticeType.Error),
-         (S.warnings, NoticeType.Warning),
-         (S.notices, NoticeType.Notice)).flatMap(computeMessageDiv)
-  }
-
-  def lowerCaseTitle(noticeType: NoticeType.Value): String = noticeType match {
-    case NoticeType.Notice => "info"
-    case _ => noticeType.lowerCaseTitle
+    <div id="id_alerts_container">{
+      List(
+        (S.errors, NoticeType.Error),
+        (S.warnings, NoticeType.Warning),
+        (S.notices, NoticeType.Notice)
+      ).flatMap(computeMessageDiv)}
+    </div>
   }
 
   def noticeTitle(noticeType: NoticeType.Value): Box[String] = noticeType match {

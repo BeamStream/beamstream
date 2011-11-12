@@ -1,13 +1,25 @@
 <div lift="surround?with=default;at=content">
+  <div lift="BootstrapAlerts?showall=true"></div>
+  <!--
+  <lift:msgs showAll="true">
+    <lift:error_class>alert-message block-message error</lift:error_class>
+    <lift:notice_class>alert-message block-message info</lift:notice_class>
+    <lift:warning_class>alert-message block-message warning</lift:warning_class>
+  </lift:msgs>
+  -->
   <!-- Example row of columns -->
   <div class="row">
-    <div class="span6">
-      <h2>Heading</h2>
-      <p>Etiam porta sem malesuada magna mollis euismod. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
-      <p><a class="btn" href="#">View details &raquo;</a></p>
+    <div class="span12">
+      <form lift="MsgTest?form=post">
+        <p>Error: <br /><input name="error"></input></p>
+        <p>Error2: <br /><input name="error2"></input></p>
+        <p>Warning: <br /><input name="warning"></input></p>
+        <p>Info: <br /><input name="info"></input></p>
+        <p><input type="submit" value="submit"></input></p>
+      </form>
     </div>
-    <div class="span10">
-      <h2>Heading</h2>
+    <div class="span4">
+      <h5>Heading</h5>
        <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
       <p><a class="btn" href="#">View details &raquo;</a></p>
    </div>

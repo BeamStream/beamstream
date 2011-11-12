@@ -71,11 +71,11 @@ class Boot extends Loggable {
 
     // Show the spinny image when an Ajax call starts
     LiftRules.ajaxStart =
-      Full(() => LiftRules.jsArtifacts.show("ajax-loader").cmd)
+      Full(() => LiftRules.jsArtifacts.show("ajax-spinner").cmd)
 
     // Make the spinny image go away when it ends
     LiftRules.ajaxEnd =
-      Full(() => LiftRules.jsArtifacts.hide("ajax-loader").cmd)
+      Full(() => LiftRules.jsArtifacts.hide("ajax-spinner").cmd)
 
     // Force the request to be UTF-8
     LiftRules.early.append(_.setCharacterEncoding("UTF-8"))

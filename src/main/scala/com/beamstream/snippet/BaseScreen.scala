@@ -13,8 +13,8 @@ import util.Helpers._
  */
 trait BaseScreen extends LiftScreen {
   override def allTemplatePath = "templates-hidden" :: "bootstrap-screen" :: Nil
-  override val cancelButton = super.cancelButton % ("class" -> "btn")
-  override val finishButton = super.finishButton % ("class" -> "btn primary")
+  override val cancelButton = super.cancelButton % ("class" -> "btn") % ("tabindex" -> "1")
+  override val finishButton = super.finishButton % ("class" -> "btn primary") % ("tabindex" -> "1")
 
   def displayOnly(fieldName: => String, html: NodeSeq) =
     new Field {
