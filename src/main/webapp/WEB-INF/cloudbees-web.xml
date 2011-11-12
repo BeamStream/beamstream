@@ -6,7 +6,7 @@
 <!-- This servlet context parameter will only be visible when running via CloudBees. -->
 <context-param>
   <param-name>run.mode</param-name>
-  <param-value>production</param-value>
+  <param-value>staging</param-value>
 </context-param>
 
 <!--
