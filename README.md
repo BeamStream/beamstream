@@ -1,6 +1,6 @@
 # Twitter Bootstrap
 
-Bootstrap is included via a git submodule. When first checking out this project
+Bootstrap is included via a git submodule. After creating this project
 you must run:
 
     git init
@@ -9,6 +9,13 @@ you must run:
     git add modules/bootstrap
 
 This will pull in the necessary files.
+
+Once the submodule files (modules/bootstrap and .gitmodules) have been committed to the repository,
+it can be cloned regularly, but you must run:
+
+    git submodule update
+
+For the files to be pulled in.
 
 To update the version that is being used, you must run _git fetch/pull_ in the submodule
 directory, then commit the version the submodule is using to the main project. For
@@ -25,7 +32,7 @@ the cloud providers and configure it in your props file. See config.MongoConfig 
 
 This app uses sbt 0.11. To build for the first time, run:
 
-    bash\$ sbt
+    bash$ sbt
     > compile
     > container:start
 
