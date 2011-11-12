@@ -7,4 +7,4 @@ mongo.default.user=cloudbees
 mongo.default.pwd=bd4924f95b903ce06133d3ebfb0c3b66
 facebook.key=206389419434913
 facebook.secret=dc481256af9e0f4d014f2de4afe983bc
-google.analytics.id=UA-18936722
+google.analytics.id=UA-18936722-1
