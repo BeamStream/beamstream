@@ -22,6 +22,8 @@ html, body, div, span, h1, h2, h3, h4, h5, h6, p, em, img, strong, sub, sup, b, 
 	background: transparent;
 	font-size: 100%;
 }
+
+
 a {
 	margin:0;
 	padding:0;
@@ -152,6 +154,9 @@ input[type="submit"]:hover{background:url(/img/btn_red_hover.png) left top no-re
 div.form-container form input{ float:left;}
 div.form-container form { margin:10px 0px 20px 34px;height:45px; }
 /*
+.coming_soon span {
+font-style: italic;
+}
 .join_vip_list input{ float:left;}
 .join_vip_list{ margin:10px 0px 20px 34px;height:45px; }
 */
@@ -183,6 +188,8 @@ div.form-container form { margin:10px 0px 20px 34px;height:45px; }
 		ul.num li.n3{ background:url(/img/3.png) left top no-repeat; }
 		ul.num li.n4{ background:url(/img/4.png) left top no-repeat; }
 		ul.num span{ color:#666666;}
+		
+		.col_2 ul.num li{padding-right: 4em;}
 
 		.google{ float:right;}
 		.facebook{float:right;}
