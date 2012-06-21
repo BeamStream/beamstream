@@ -25,7 +25,7 @@ class Boot extends Loggable {
   def boot {
     logger.info("Run Mode: "+Props.mode.toString)
 
-    // init mongodb
+    // init mongodb test
     MongoConfig.init()
 
     // init auth-mongo
